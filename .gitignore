@@ -3,5 +3,6 @@ dist
 .idea
 
 *.egg-info
+*.eggs
 *.pyc
 __pycache__
