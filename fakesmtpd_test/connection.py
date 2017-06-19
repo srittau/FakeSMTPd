@@ -172,3 +172,207 @@ class ConnectionHandlerTest(TestCase):
         self._handle()
         self.writer.assert_last_reply(
             SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Missing arguments")
+
+    def test_mail(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FrOm:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Sender OK")
+
+    def test_mail_with_helo(self):
+        self.reader.lines = [
+            "HELO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Sender OK")
+
+    def test_mail_no_from(self):
+        self.reader.lines = \
+            ["EHLO client.example.com", "MAIL ABC:<foo@example.com>"]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+
+    def test_mail_invalid_sender(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:foo@example.com",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+
+    def test_mail_without_ehlo(self):
+        self.reader.lines = ["MAIL FROM:<foo@example.com>"]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.BAD_SEQUENCE, "No EHLO sent")
+
+    def test_mail_twice(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "MAIL FROM:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+
+    def test_rcpt(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT tO:<bar@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Receiver OK")
+
+    def test_rcpt_multiple(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar1@example.com>",
+            "RCPT TO:<bar2@example.com>",
+            "RCPT TO:<bar3@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Receiver OK")
+
+    def test_rcpt_no_to(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT <bar@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+
+    def test_rcpt_invalid_address(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:foo@example.com",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+
+    def test_rcpt_without_mail(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "RCPT TO:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+
+    def test_data(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar@example.com>",
+            "DATA",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.START_MAIL_INPUT,
+            "Enter mail text. End with . on a separate line.")
+
+    def test_data_with_arguments(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar@example.com>",
+            "DATA foo",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Unexpected arguments")
+
+    def test_data_without_rcpt(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "DATA",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+
+    def test_complete_mail(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar@example.com>",
+            "DATA",
+            "From: foo@example.com",
+            "To: bar@example.com",
+            "Subject: Foobar",
+            ""
+            "Line 1",
+            "Line 2",
+            ".",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "OK")
+
+    def test_two_transactions(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar@example.com>",
+            "DATA",
+            "From: foo@example.com",
+            "To: bar@example.com",
+            "Subject: Foobar",
+            ""
+            ".",
+            "MAIL FROM:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Sender OK")
+
+    def test_rset(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RSET",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "OK")
+
+    def test_rset_with_argument(self):
+        self.reader.lines = ["RSET foo"]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Unexpected arguments")
+
+    def test_transaction_after_rset(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RSET",
+            "MAIL FROM:<foo@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "Sender OK")
+
+    def test_rcpt_after_rset(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RSET",
+            "RCPT TO:<bar@example.com>",
+        ]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+
+    def test_vrfy(self):
+        self.reader.lines = ["VRFY client.example.com"]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.CANNOT_VRFY, "Verify not allowed")
