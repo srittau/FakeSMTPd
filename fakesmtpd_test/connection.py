@@ -1,12 +1,14 @@
 import asyncio
-from typing import List
-from unittest.case import TestCase
+from typing import List, Optional
+from unittest import TestCase
 from unittest.mock import patch
 
-from asserts import assert_equal, assert_greater_equal, fail
+from asserts import assert_equal, assert_greater_equal, fail, \
+    assert_is_not_none, assert_datetime_about_now_utc
 
-from fakesmtpd.connection import handle_connection
+from fakesmtpd.connection import ConnectionHandler
 from fakesmtpd.smtp import SMTPStatus
+from fakesmtpd.state import State
 
 FAKE_HOST = "mail.example.com"
 
@@ -78,6 +80,7 @@ class ConnectionHandlerTest(TestCase):
             patch("fakesmtpd.commands.getfqdn", lambda: FAKE_HOST)
         self._getfqdn_patch1.start()
         self._getfqdn_patch2.start()
+        self.printed_state: Optional[State] = None
 
     def tearDown(self):
         self._getfqdn_patch1.stop()
@@ -85,8 +88,11 @@ class ConnectionHandlerTest(TestCase):
 
     def _handle(self):
         loop = asyncio.get_event_loop()
-        c = handle_connection(self.reader, self.writer)
-        loop.run_until_complete(c)
+        handler = ConnectionHandler(self.reader, self.writer, self._print_mail)
+        loop.run_until_complete(handler.handle())
+
+    def _print_mail(self, state: State) -> None:
+        self.printed_state = state
 
     def test_greeting(self):
         self._handle()
@@ -311,7 +317,7 @@ class ConnectionHandlerTest(TestCase):
             "From: foo@example.com",
             "To: bar@example.com",
             "Subject: Foobar",
-            ""
+            "",
             "Line 1",
             "Line 2",
             ".",
@@ -328,7 +334,7 @@ class ConnectionHandlerTest(TestCase):
             "From: foo@example.com",
             "To: bar@example.com",
             "Subject: Foobar",
-            ""
+            "",
             ".",
             "MAIL FROM:<foo@example.com>",
         ]
@@ -376,3 +382,33 @@ class ConnectionHandlerTest(TestCase):
         self._handle()
         self.writer.assert_last_reply(
             SMTPStatus.CANNOT_VRFY, "Verify not allowed")
+
+    def test_mail_printed(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar1@example.com>",
+            "RCPT TO:<bar2@example.com>",
+            "DATA",
+            "From: foo@example.com",
+            "To: bar@example.com",
+            "Subject: Foobar",
+            "",
+            "Line 1  ",
+            "Line 2",
+            ".",
+        ]
+        self._handle()
+        assert_is_not_none(self.printed_state)
+        assert_datetime_about_now_utc(self.printed_state.date)
+        assert_equal("foo@example.com", self.printed_state.reverse_path)
+        assert_equal(["bar1@example.com", "bar2@example.com"],
+                     self.printed_state.forward_path)
+        assert_equal(
+            "From: foo@example.com\r\n"
+            "To: bar@example.com\r\n"
+            "Subject: Foobar\r\n"
+            "\r\n"
+            "Line 1  \r\n"
+            "Line 2\r\n",
+            self.printed_state.mail_data)

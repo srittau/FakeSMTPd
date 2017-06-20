@@ -1,7 +1,8 @@
+import datetime
 from asyncio.streams import StreamReader, StreamWriter
 import logging
 from socket import getfqdn
-from typing import Tuple
+from typing import Tuple, Callable
 
 from fakesmtpd.commands import handle_command
 from fakesmtpd.smtp import SMTPStatus
@@ -15,9 +16,11 @@ class UnexpectedEOFError(Exception):
 
 class ConnectionHandler:
 
-    def __init__(self, reader: StreamReader, writer: StreamWriter) -> None:
+    def __init__(self, reader: StreamReader, writer: StreamWriter,
+                 print_mail: Callable[[State], None]) -> None:
         self.reader = reader
         self.writer = writer
+        self.print_mail = print_mail
         self.state = State()
 
     async def handle(self) -> None:
@@ -51,22 +54,20 @@ class ConnectionHandler:
             pass
         else:
             self._write_reply(SMTPStatus.OK, "OK")
-            self.state.clear()
+            self.state.date = datetime.datetime.utcnow()
+            state = self.state
+            self.print_mail(state)
+            self.state = State()
+            self.state.greeted = state.greeted
 
-    async def _read_mail_text(self) -> str:
-        text = ""
+    async def _read_mail_text(self) -> None:
         while not self.reader.at_eof():
             line = await self.reader.readline()
             if line == b".\r\n":
-                return text
-            text += line.decode("ascii")
+                return
+            self.state.add_line(line.decode("ascii"))
         raise UnexpectedEOFError()
 
     def _write_reply(self, code: SMTPStatus, text: str) -> None:
         full_line = f"{code.value} {text}\r\n"
         self.writer.write(full_line.encode("ascii"))
-
-
-async def handle_connection(reader: StreamReader, writer: StreamWriter) \
-        -> None:
-    await ConnectionHandler(reader, writer).handle()

@@ -1,11 +1,15 @@
 import asyncio
+from asyncio.streams import StreamReader, StreamWriter
 import logging
 import signal
 import sys
 from typing import Optional
 
+from functools import partial
+
 from fakesmtpd.args import parse_args
-from fakesmtpd.connection import handle_connection
+from fakesmtpd.connection import ConnectionHandler
+from fakesmtpd.mbox import print_mbox_mail
 
 
 def main() -> None:
@@ -25,3 +29,9 @@ def run_server(host: Optional[str], port: int) -> None:
     s = asyncio.start_server(handle_connection, host=host, port=port)
     loop.run_until_complete(s)
     loop.run_forever()
+
+
+async def handle_connection(reader: StreamReader, writer: StreamWriter) \
+        -> None:
+    print_it = partial(print_mbox_mail, sys.stdout)
+    await ConnectionHandler(reader, writer, print_it).handle()

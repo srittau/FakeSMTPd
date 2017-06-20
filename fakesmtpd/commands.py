@@ -34,14 +34,15 @@ def handle_helo(state: State, arguments: str) -> Reply:
 
 
 def handle_mail(state: State, arguments: str) -> Reply:
-    if not re.match(r"^FROM:<.*>", arguments, re.IGNORECASE):
+    m = re.match(r"^FROM:<(.*)>", arguments, re.IGNORECASE)
+    if not m:
         return handle_wrong_arguments()
     if not state.greeted:
         return handle_no_greeting()
     if not state.mail_allowed:
         return handle_bad_command_sequence()
     state.clear()
-    state.reverse_path = ""
+    state.reverse_path = m.group(1)
     return SMTPStatus.OK, "Sender OK"
 
 
@@ -57,11 +58,12 @@ def handle_quit(state: State, arguments: str) -> Reply:
 
 
 def handle_rcpt(state: State, arguments: str) -> Reply:
-    if not re.match(r"^TO:<.*>", arguments, re.IGNORECASE):
+    m = re.match(r"^TO:<(.*)>", arguments, re.IGNORECASE)
+    if not m:
         return handle_wrong_arguments()
     if not state.rcpt_allowed:
         return handle_bad_command_sequence()
-    state.forward_path = []
+    state.add_forward_path(m.group(1))
     return SMTPStatus.OK, "Receiver OK"
 
 
