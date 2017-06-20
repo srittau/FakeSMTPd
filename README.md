@@ -1,5 +1,6 @@
 # FakeSMTPd
 
+[![GitHub Release](https://img.shields.io/github/release/srittau/fakesmtpd/all.svg)](https://github.com/srittau/FakeSMTPd/releases/)
 [![Build Status](https://travis-ci.org/srittau/FakeSMTPd.svg?branch=master)](https://travis-ci.org/srittau/FakeSMTPd)
 
 FakeSMTPd is an SMTP server for testing mail functionality. Any mail sent via
@@ -19,3 +20,5 @@ Supported options:
   * `-o`, `--output-filename [FILENAME]` mbox file for output, default: stdout
   * `-b`, `--bind [ADDRESS]` IP addresses to listen on, default: 127.0.0.1
   * `-p`, `--port [PORT]` SMTP port to listen on
+
+Docker image [available](https://hub.docker.com/r/srittau/fakesmtpd/).
