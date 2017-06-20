@@ -9,7 +9,7 @@ def read(fname):
 
 
 setup(
-    name="eventstreamd",
+    name="FakeSMTPd",
     version="0.1.1",
     description="SMTP server for testing mail functionality",
     long_description=read("README.md"),
