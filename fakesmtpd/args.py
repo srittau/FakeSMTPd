@@ -1,11 +1,14 @@
 import argparse
 from smtplib import SMTP_PORT
-from typing import List, Any
+from typing import Any
 
 
-def parse_args(argv: List[str]) -> Any:
+def parse_args() -> Any:
     parser = argparse.ArgumentParser(
         description="SMTP server for testing mail functionality")
+    parser.add_argument(
+        "--output-filename", "-o", nargs="?", default="-",
+        help="output mbox file, default stdout")
     parser.add_argument(
         "--bind", "-b", nargs="?", default="127.0.0.1",
         help="IP address range to listen to")

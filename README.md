@@ -16,5 +16,6 @@ Usage
 
 Supported options:
 
-  * `-b, --bind [ADDRESS]` IP addresses to listen on, defaults to 127.0.0.1
-  * `-p, --port [PORT]` SMTP port to listen on
+  * `-o`, `--output-filename [FILENAME]` mbox file for output, default: stdout
+  * `-b`, `--bind [ADDRESS]` IP addresses to listen on, default: 127.0.0.1
+  * `-p`, `--port [PORT]` SMTP port to listen on

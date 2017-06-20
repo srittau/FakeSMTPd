@@ -14,24 +14,24 @@ from fakesmtpd.mbox import print_mbox_mail
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
-    args = parse_args(sys.argv)
+    args = parse_args()
+    printer = partial(print_mbox_mail, args.output_filename)
     try:
-        run_server(args.bind, args.port)
+        run_server(args.bind, args.port, partial(handle_connection, printer))
     except PermissionError as exc:
         print(str(exc), file=sys.stderr)
         sys.exit(1)
 
 
-def run_server(host: Optional[str], port: int) -> None:
+def run_server(host: Optional[str], port: int, handler) -> None:
     loop = asyncio.get_event_loop()
     loop.add_signal_handler(signal.SIGINT, loop.stop)
     loop.add_signal_handler(signal.SIGTERM, loop.stop)
-    s = asyncio.start_server(handle_connection, host=host, port=port)
+    s = asyncio.start_server(handler, host=host, port=port)
     loop.run_until_complete(s)
     loop.run_forever()
 
 
-async def handle_connection(reader: StreamReader, writer: StreamWriter) \
-        -> None:
-    print_it = partial(print_mbox_mail, sys.stdout)
-    await ConnectionHandler(reader, writer, print_it).handle()
+async def handle_connection(
+        printer, reader: StreamReader, writer: StreamWriter) -> None:
+    await ConnectionHandler(reader, writer, printer).handle()
