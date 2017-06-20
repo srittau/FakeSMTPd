@@ -7,6 +7,9 @@ def parse_args(argv: List[str]) -> Any:
     parser = argparse.ArgumentParser(
         description="SMTP server for testing mail functionality")
     parser.add_argument(
+        "--bind", "-b", nargs="?", default="127.0.0.1",
+        help="IP address range to listen to")
+    parser.add_argument(
         "--port", "-p", type=int, nargs="?", default=SMTP_PORT,
         help="SMTP port to listen on")
     return parser.parse_args()
