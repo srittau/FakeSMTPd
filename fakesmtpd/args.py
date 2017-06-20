@@ -1,0 +1,12 @@
+import argparse
+from smtplib import SMTP_PORT
+from typing import List, Any
+
+
+def parse_args(argv: List[str]) -> Any:
+    parser = argparse.ArgumentParser(
+        description="SMTP server for testing mail functionality")
+    parser.add_argument(
+        "--port", "-p", type=int, nargs="?", default=SMTP_PORT,
+        help="SMTP port to listen on")
+    return parser.parse_args()
