@@ -23,7 +23,7 @@ class FakeStreamReader:
     async def readline(self) -> bytes:
         if not self.lines:
             return b""
-        line = self.lines[0].encode("ascii") + b"\r\n"
+        line = self.lines[0].encode("latin1") + b"\r\n"
         self.lines = self.lines[1:]
         return line
 
@@ -411,4 +411,29 @@ class ConnectionHandlerTest(TestCase):
             "\r\n"
             "Line 1  \r\n"
             "Line 2\r\n",
+            self.printed_state.mail_data)
+
+    def test_8bit_command(self):
+        self.reader.lines = ["EHLO cl\xe4ent.example.com"]
+        self._handle()
+        self.writer.assert_last_reply(
+            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+            "Unexpected 8 bit character")
+
+    def test_8bit_text(self):
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar1@example.com>",
+            "DATA",
+            "From: f\xf6o@example.com",
+            "",
+            "B\xe4r",
+            ".",
+        ]
+        self._handle()
+        assert_equal(
+            "From: f\x76o@example.com\r\n"
+            "\r\n"
+            "B\x64r\r\n",
             self.printed_state.mail_data)

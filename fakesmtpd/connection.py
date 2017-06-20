@@ -1,3 +1,4 @@
+import codecs
 import datetime
 from asyncio.streams import StreamReader, StreamWriter
 import logging
@@ -12,6 +13,15 @@ from fakesmtpd.state import State
 class UnexpectedEOFError(Exception):
 
     pass
+
+
+def replace_by_7_bit(error: UnicodeDecodeError) -> Tuple[str, int]:
+    b = error.object[error.start:error.end]
+    c = chr(ord(b) & 0x7f)
+    return c, error.end
+
+
+codecs.register_error("7bit", replace_by_7_bit)
 
 
 class ConnectionHandler:
@@ -30,22 +40,32 @@ class ConnectionHandler:
             "{} FakeSMTPd Service ready".format(getfqdn()))
         while not self.reader.at_eof():
             line = await self.reader.readline()
-            decoded = line.decode("ascii").rstrip()
-            logging.debug(f"received command: {decoded}")
-            command, arguments = self._parse_line(decoded)
-            code, text = handle_command(self.state, command, arguments)
-            logging.debug(f"sending response: {code} {text}")
-            self._write_reply(code, text)
-            if code == SMTPStatus.SERVICE_CLOSING:
-                break
-            elif code == SMTPStatus.START_MAIL_INPUT:
+            try:
+                decoded = line.decode("ascii").rstrip()
+            except UnicodeDecodeError:
+                self._write_reply(
+                    SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                    "Unexpected 8 bit character")
+                continue
+            code = self._handle_line(decoded)
+            if code == SMTPStatus.START_MAIL_INPUT:
                 await self._handle_mail_text()
+            elif code == SMTPStatus.SERVICE_CLOSING:
+                break
         self.writer.close()
         logging.info("connection closed")
 
     def _parse_line(self, line: str) -> Tuple[str, str]:
         command = line[:4].upper()
         return command, line[5:]
+
+    def _handle_line(self, line: str):
+        logging.debug(f"received command: {line}")
+        command, arguments = self._parse_line(line)
+        code, text = handle_command(self.state, command, arguments)
+        logging.debug(f"sending response: {code} {text}")
+        self._write_reply(code, text)
+        return code
 
     async def _handle_mail_text(self):
         try:
@@ -65,7 +85,7 @@ class ConnectionHandler:
             line = await self.reader.readline()
             if line == b".\r\n":
                 return
-            self.state.add_line(line.decode("ascii"))
+            self.state.add_line(line.decode("ascii", "7bit"))
         raise UnexpectedEOFError()
 
     def _write_reply(self, code: SMTPStatus, text: str) -> None:
