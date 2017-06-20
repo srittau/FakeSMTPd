@@ -19,6 +19,8 @@ class PrintMboxMailTest(TestCase):
         state.mail_data = "Subject: Foo\r\n\r\nText\r\n"
         print_mbox_mail(out, state)
         assert_equal("From sender@example.com Sun Jun  4 14:34:15 2017\n"
+                     "X-FakeSMTPd-Receiver: receiver1@example.com\n"
+                     "X-FakeSMTPd-Receiver: receiver2@example.com\n"
                      "Subject: Foo\n"
                      "\n"
                      "Text\n"

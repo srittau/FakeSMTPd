@@ -6,7 +6,8 @@ FakeSMTPd is an SMTP server for testing mail functionality. Any mail sent via
 this server will be saved, but will not be forwarded any further.
 
 Mail is printed to stdout by default in default mbox format, as defined in
-[RFC 4155](https://www.ietf.org/rfc/rfc4155.txt).
+[RFC 4155](https://www.ietf.org/rfc/rfc4155.txt). The SMTP mail receivers
+are added in X-FakeSMTPd-Receiver headers.
 
 Usage
 -----
