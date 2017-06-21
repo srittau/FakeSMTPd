@@ -15,10 +15,13 @@ class UnexpectedEOFError(Exception):
     pass
 
 
-def replace_by_7_bit(error: UnicodeDecodeError) -> Tuple[str, int]:
-    b = error.object[error.start:error.end]
-    c = chr(ord(b) & 0x7f)
-    return c, error.end
+def replace_by_7_bit(error: UnicodeError) -> Tuple[str, int]:
+    if isinstance(error, UnicodeDecodeError):
+        b = error.object[error.start:error.end]
+        c = chr(ord(b) & 0x7f)
+        return c, error.end
+    else:
+        raise NotImplementedError()
 
 
 codecs.register_error("7bit", replace_by_7_bit)
