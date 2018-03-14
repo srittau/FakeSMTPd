@@ -10,7 +10,7 @@ from fakesmtpd.state import State
 
 class WriteMboxMailTest(TestCase):
 
-    def test_print(self):
+    def test_print(self) -> None:
         out = StringIO()
         state = State()
         state.date = datetime.datetime(2017, 6, 4, 14, 34, 15)

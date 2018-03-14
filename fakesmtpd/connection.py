@@ -1,7 +1,7 @@
 import codecs
 import datetime
-from asyncio.streams import StreamReader, StreamWriter
 import logging
+from asyncio.streams import StreamReader, StreamWriter
 from socket import getfqdn
 from typing import Tuple, Callable
 
@@ -62,7 +62,7 @@ class ConnectionHandler:
         command = line[:4].upper()
         return command, line[5:]
 
-    def _handle_line(self, line: str):
+    def _handle_line(self, line: str) -> SMTPStatus:
         logging.debug(f"received command: {line}")
         command, arguments = self._parse_line(line)
         code, text = handle_command(self.state, command, arguments)
@@ -70,7 +70,7 @@ class ConnectionHandler:
         self._write_reply(code, text)
         return code
 
-    async def _handle_mail_text(self):
+    async def _handle_mail_text(self) -> None:
         try:
             await self._read_mail_text()
         except UnexpectedEOFError:

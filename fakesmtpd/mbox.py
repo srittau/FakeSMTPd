@@ -1,4 +1,5 @@
 import sys
+from typing import IO
 
 from fakesmtpd.state import State
 
@@ -12,7 +13,10 @@ def print_mbox_mail(filename: str, state: State) -> None:
             write_mbox_mail(f, state)
 
 
-def write_mbox_mail(stream, state) -> None:
+def write_mbox_mail(stream: IO[str], state: State) -> None:
+    assert state.date is not None
+    assert state.forward_path is not None
+    assert state.mail_data is not None
     stream.write(f"From {state.reverse_path} {state.date.ctime()}\n")
     for receiver in state.forward_path:
         stream.write(f"X-FakeSMTPd-Receiver: {receiver}\n")

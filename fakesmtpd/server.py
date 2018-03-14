@@ -1,15 +1,16 @@
 import asyncio
-from asyncio.streams import StreamReader, StreamWriter
 import logging
 import signal
 import sys
-from typing import Optional
+from asyncio.streams import StreamReader, StreamWriter
+from typing import Callable, Optional, Awaitable
 
 from functools import partial
 
 from fakesmtpd.args import parse_args
 from fakesmtpd.connection import ConnectionHandler
 from fakesmtpd.mbox import print_mbox_mail
+from fakesmtpd.state import State
 
 
 def main() -> None:
@@ -23,7 +24,11 @@ def main() -> None:
         sys.exit(1)
 
 
-def run_server(host: Optional[str], port: int, handler) -> None:
+_ServerHandler = \
+    Callable[[StreamReader, StreamWriter], Optional[Awaitable[None]]]
+
+
+def run_server(host: str, port: int, handler: _ServerHandler) -> None:
     loop = asyncio.get_event_loop()
     loop.add_signal_handler(signal.SIGINT, loop.stop)
     loop.add_signal_handler(signal.SIGTERM, loop.stop)
@@ -33,5 +38,6 @@ def run_server(host: Optional[str], port: int, handler) -> None:
 
 
 async def handle_connection(
-        printer, reader: StreamReader, writer: StreamWriter) -> None:
+        printer: Callable[[State], None], reader: StreamReader,
+        writer: StreamWriter) -> None:
     await ConnectionHandler(reader, writer, printer).handle()
