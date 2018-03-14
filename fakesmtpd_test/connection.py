@@ -15,7 +15,6 @@ FAKE_HOST = "mail.example.com"
 
 
 class FakeStreamReader:
-
     def __init__(self) -> None:
         self.lines: List[str] = []
 
@@ -38,7 +37,6 @@ class FakeStreamReader:
 
 
 class FakeStreamWriter:
-
     def __init__(self) -> None:
         self.open = True
         self.data = b""
@@ -71,7 +69,6 @@ class FakeStreamWriter:
 
 
 class ConnectionHandlerTest(TestCase):
-
     def setUp(self) -> None:
         self.reader = FakeStreamReader()
         self.writer = FakeStreamWriter()
@@ -90,8 +87,7 @@ class ConnectionHandlerTest(TestCase):
     def _handle(self) -> None:
         loop = asyncio.get_event_loop()
         handler = ConnectionHandler(
-            cast(StreamReader, self.reader),
-            cast(StreamWriter, self.writer),
+            cast(StreamReader, self.reader), cast(StreamWriter, self.writer),
             self._print_mail)
         loop.run_until_complete(handler.handle())
 
@@ -107,14 +103,14 @@ class ConnectionHandlerTest(TestCase):
     def test_invalid_line(self) -> None:
         self.reader.lines = ["ab"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.COMMAND_UNRECOGNIZED, "Command unrecognized")
+        self.writer.assert_last_reply(SMTPStatus.COMMAND_UNRECOGNIZED,
+                                      "Command unrecognized")
 
     def test_unrecognized_command(self) -> None:
         self.reader.lines = ["XUNK "]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.COMMAND_UNRECOGNIZED, "Command unrecognized")
+        self.writer.assert_last_reply(SMTPStatus.COMMAND_UNRECOGNIZED,
+                                      "Command unrecognized")
 
     def test_noop(self) -> None:
         self.reader.lines = ["NOOP"]
@@ -147,8 +143,8 @@ class ConnectionHandlerTest(TestCase):
     def test_quit_with_arguments(self) -> None:
         self.reader.lines = ["QUIT foo"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Unexpected arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Unexpected arguments")
         self.writer.assert_is_closed()
 
     def test_quit__without_closing_channel(self) -> None:
@@ -162,26 +158,26 @@ class ConnectionHandlerTest(TestCase):
     def test_helo(self) -> None:
         self.reader.lines = ["HELO client.example.com"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.OK, f"{FAKE_HOST} Hello client.example.com")
+        self.writer.assert_last_reply(SMTPStatus.OK,
+                                      f"{FAKE_HOST} Hello client.example.com")
 
     def test_helo__no_domain(self) -> None:
         self.reader.lines = ["HELO "]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Missing arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Missing arguments")
 
     def test_ehlo(self) -> None:
         self.reader.lines = ["EHLO client.example.com"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.OK, f"{FAKE_HOST} Hello client.example.com")
+        self.writer.assert_last_reply(SMTPStatus.OK,
+                                      f"{FAKE_HOST} Hello client.example.com")
 
     def test_ehlo__no_domain(self) -> None:
         self.reader.lines = ["EHLO "]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Missing arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Missing arguments")
 
     def test_mail(self) -> None:
         self.reader.lines = [
@@ -203,8 +199,8 @@ class ConnectionHandlerTest(TestCase):
         self.reader.lines = \
             ["EHLO client.example.com", "MAIL ABC:<foo@example.com>"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Syntax error in arguments")
 
     def test_mail_invalid_sender(self) -> None:
         self.reader.lines = [
@@ -212,8 +208,8 @@ class ConnectionHandlerTest(TestCase):
             "MAIL FROM:foo@example.com",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Syntax error in arguments")
 
     def test_mail_without_ehlo(self) -> None:
         self.reader.lines = ["MAIL FROM:<foo@example.com>"]
@@ -227,8 +223,8 @@ class ConnectionHandlerTest(TestCase):
             "MAIL FROM:<foo@example.com>",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+        self.writer.assert_last_reply(SMTPStatus.BAD_SEQUENCE,
+                                      "Bad command sequence")
 
     def test_rcpt(self) -> None:
         self.reader.lines = [
@@ -257,8 +253,8 @@ class ConnectionHandlerTest(TestCase):
             "RCPT <bar@example.com>",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Syntax error in arguments")
 
     def test_rcpt_invalid_address(self) -> None:
         self.reader.lines = [
@@ -267,8 +263,8 @@ class ConnectionHandlerTest(TestCase):
             "RCPT TO:foo@example.com",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Syntax error in arguments")
 
     def test_rcpt_without_mail(self) -> None:
         self.reader.lines = [
@@ -276,8 +272,8 @@ class ConnectionHandlerTest(TestCase):
             "RCPT TO:<foo@example.com>",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+        self.writer.assert_last_reply(SMTPStatus.BAD_SEQUENCE,
+                                      "Bad command sequence")
 
     def test_data(self) -> None:
         self.reader.lines = [
@@ -299,8 +295,8 @@ class ConnectionHandlerTest(TestCase):
             "DATA foo",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Unexpected arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Unexpected arguments")
 
     def test_data_without_rcpt(self) -> None:
         self.reader.lines = [
@@ -309,8 +305,8 @@ class ConnectionHandlerTest(TestCase):
             "DATA",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+        self.writer.assert_last_reply(SMTPStatus.BAD_SEQUENCE,
+                                      "Bad command sequence")
 
     def test_complete_mail(self) -> None:
         self.reader.lines = [
@@ -357,8 +353,8 @@ class ConnectionHandlerTest(TestCase):
     def test_rset_with_argument(self) -> None:
         self.reader.lines = ["RSET foo"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Unexpected arguments")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Unexpected arguments")
 
     def test_transaction_after_rset(self) -> None:
         self.reader.lines = [
@@ -378,14 +374,14 @@ class ConnectionHandlerTest(TestCase):
             "RCPT TO:<bar@example.com>",
         ]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.BAD_SEQUENCE, "Bad command sequence")
+        self.writer.assert_last_reply(SMTPStatus.BAD_SEQUENCE,
+                                      "Bad command sequence")
 
     def test_vrfy(self) -> None:
         self.reader.lines = ["VRFY client.example.com"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.CANNOT_VRFY, "Verify not allowed")
+        self.writer.assert_last_reply(SMTPStatus.CANNOT_VRFY,
+                                      "Verify not allowed")
 
     def test_mail_printed(self) -> None:
         self.reader.lines = [
@@ -409,21 +405,18 @@ class ConnectionHandlerTest(TestCase):
         assert_equal("foo@example.com", self.printed_state.reverse_path)
         assert_equal(["bar1@example.com", "bar2@example.com"],
                      self.printed_state.forward_path)
-        assert_equal(
-            "From: foo@example.com\r\n"
-            "To: bar@example.com\r\n"
-            "Subject: Foobar\r\n"
-            "\r\n"
-            "Line 1  \r\n"
-            "Line 2\r\n",
-            self.printed_state.mail_data)
+        assert_equal("From: foo@example.com\r\n"
+                     "To: bar@example.com\r\n"
+                     "Subject: Foobar\r\n"
+                     "\r\n"
+                     "Line 1  \r\n"
+                     "Line 2\r\n", self.printed_state.mail_data)
 
     def test_8bit_command(self) -> None:
         self.reader.lines = ["EHLO cl\xe4ent.example.com"]
         self._handle()
-        self.writer.assert_last_reply(
-            SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
-            "Unexpected 8 bit character")
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                      "Unexpected 8 bit character")
 
     def test_8bit_text(self) -> None:
         self.reader.lines = [
@@ -438,8 +431,6 @@ class ConnectionHandlerTest(TestCase):
         ]
         self._handle()
         assert self.printed_state is not None
-        assert_equal(
-            "From: f\x76o@example.com\r\n"
-            "\r\n"
-            "B\x64r\r\n",
-            self.printed_state.mail_data)
+        assert_equal("From: f\x76o@example.com\r\n"
+                     "\r\n"
+                     "B\x64r\r\n", self.printed_state.mail_data)

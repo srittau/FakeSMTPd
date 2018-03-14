@@ -28,7 +28,6 @@ codecs.register_error("7bit", replace_by_7_bit)
 
 
 class ConnectionHandler:
-
     def __init__(self, reader: StreamReader, writer: StreamWriter,
                  print_mail: Callable[[State], None]) -> None:
         self.reader = reader
@@ -38,17 +37,15 @@ class ConnectionHandler:
 
     async def handle(self) -> None:
         logging.info("connection opened")
-        self._write_reply(
-            SMTPStatus.SERVICE_READY,
-            "{} FakeSMTPd Service ready".format(getfqdn()))
+        self._write_reply(SMTPStatus.SERVICE_READY,
+                          "{} FakeSMTPd Service ready".format(getfqdn()))
         while not self.reader.at_eof():
             line = await self.reader.readline()
             try:
                 decoded = line.decode("ascii").rstrip()
             except UnicodeDecodeError:
-                self._write_reply(
-                    SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
-                    "Unexpected 8 bit character")
+                self._write_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                                  "Unexpected 8 bit character")
                 continue
             code = self._handle_line(decoded)
             if code == SMTPStatus.START_MAIL_INPUT:

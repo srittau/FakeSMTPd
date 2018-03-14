@@ -37,7 +37,7 @@ def run_server(host: str, port: int, handler: _ServerHandler) -> None:
     loop.run_forever()
 
 
-async def handle_connection(
-        printer: Callable[[State], None], reader: StreamReader,
-        writer: StreamWriter) -> None:
+async def handle_connection(printer: Callable[[State], None],
+                            reader: StreamReader,
+                            writer: StreamWriter) -> None:
     await ConnectionHandler(reader, writer, printer).handle()

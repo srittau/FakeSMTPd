@@ -9,7 +9,6 @@ from fakesmtpd.state import State
 
 
 class WriteMboxMailTest(TestCase):
-
     def test_print(self) -> None:
         out = StringIO()
         state = State()
