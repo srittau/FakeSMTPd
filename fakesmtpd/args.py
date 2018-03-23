@@ -1,5 +1,5 @@
 import argparse
-from smtplib import SMTP_PORT  # type: ignore
+from smtplib import SMTP_PORT
 from typing import Any
 
 
