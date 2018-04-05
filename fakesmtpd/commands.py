@@ -95,7 +95,7 @@ def handle_vrfy(state: State, arguments: str) -> Reply:
 
 
 def handle_unknown_command(state: State, arguments: str) -> Reply:
-    return SMTPStatus.COMMAND_UNRECOGNIZED, "Command unrecognized"
+    return SMTPStatus.SYNTAX_ERROR, "Command unrecognized"
 
 
 def handle_unexpected_arguments() -> Reply:

@@ -103,13 +103,13 @@ class ConnectionHandlerTest(TestCase):
     def test_invalid_line(self) -> None:
         self.reader.lines = ["ab"]
         self._handle()
-        self.writer.assert_last_reply(SMTPStatus.COMMAND_UNRECOGNIZED,
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR,
                                       "Command unrecognized")
 
     def test_unrecognized_command(self) -> None:
         self.reader.lines = ["XUNK "]
         self._handle()
-        self.writer.assert_last_reply(SMTPStatus.COMMAND_UNRECOGNIZED,
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR,
                                       "Command unrecognized")
 
     def test_noop(self) -> None:
