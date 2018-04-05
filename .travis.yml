@@ -5,3 +5,4 @@ install: pip install -r requirements.txt
 script:
   - python -m unittest discover -t . -s fakesmtpd_test -p "*.py"
   - mypy fakesmtpd fakesmtpd_test
+  - flake8 fakesmtpd fakesmtpd_test
