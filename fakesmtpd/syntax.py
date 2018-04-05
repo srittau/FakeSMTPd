@@ -1,6 +1,9 @@
 import re
 from typing import Tuple, List, Optional
 
+from fakesmtpd.smtp import SYNTAX_ERROR_MSG, PATH_TOO_LONG_MSG, \
+    SMTP_LOCAL_PART_LIMIT, SMTP_DOMAIN_LIMIT, SMTP_PATH_LIMIT
+
 _LET_DIG = r"[a-zA-Z0-9]"
 _LDH_STR = f"[a-zA-Z0-9-]*{_LET_DIG}"
 _SNUM = r"[0-9]{1,3}"
@@ -91,24 +94,28 @@ def is_valid_ipv6_address(s: str) -> bool:
 def parse_path(s: str) -> Tuple[str, str]:
     m = re.match(r"^<(.*)>", s)
     if not m:
-        raise ValueError()
+        raise ValueError(SYNTAX_ERROR_MSG)
     path = m.group(1)
-    if not _is_valid_mailbox(path):
-        raise ValueError()
+    if len(path) + 2 > SMTP_PATH_LIMIT:
+        raise ValueError(PATH_TOO_LONG_MSG)
+    _validate_mailbox(path)
     return path, s[len(path) + 2:]
 
 
-def _is_valid_mailbox(s: str) -> bool:
-    local_part, domain = s.split("@")
-    if not _is_valid_local_part(local_part):
-        return False
-    if not is_valid_domain(domain) and not is_valid_address_literal(domain):
-        return False
-    return True
+def _validate_mailbox(s: str) -> None:
+    try:
+        local_part, domain = s.split("@")
+    except ValueError:
+        raise ValueError(SYNTAX_ERROR_MSG)
+    _validate_local_part(local_part)
+    _validate_domain_part(domain)
 
 
-def _is_valid_local_part(s: str) -> bool:
-    return _is_valid_dot_string(s) or _is_valid_quoted_string(s)
+def _validate_local_part(s: str) -> None:
+    if len(s) > SMTP_LOCAL_PART_LIMIT:
+        raise ValueError(PATH_TOO_LONG_MSG)
+    if not (_is_valid_dot_string(s) or _is_valid_quoted_string(s)):
+        raise ValueError(SYNTAX_ERROR_MSG)
 
 
 def _is_valid_dot_string(s: str) -> bool:
@@ -117,6 +124,13 @@ def _is_valid_dot_string(s: str) -> bool:
 
 def _is_valid_quoted_string(s: str) -> bool:
     return _quoted_string_re.match(s) is not None
+
+
+def _validate_domain_part(s: str) -> None:
+    if len(s) > SMTP_DOMAIN_LIMIT:
+        raise ValueError(PATH_TOO_LONG_MSG)
+    if not (is_valid_domain(s) or is_valid_address_literal(s)):
+        raise ValueError(SYNTAX_ERROR_MSG)
 
 
 def parse_reverse_path(s: str) -> Tuple[str, str]:
@@ -152,5 +166,5 @@ def parse_smtp_arguments(s: str) -> List[Tuple[str, Optional[str]]]:
 def _parse_estm_param(s: str) -> Tuple[str, Optional[str]]:
     m = _esmtp_param_re.match(s)
     if not m:
-        raise ValueError()
+        raise ValueError(SYNTAX_ERROR_MSG)
     return m.group(1), m.group(3)

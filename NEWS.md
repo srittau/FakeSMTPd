@@ -5,6 +5,7 @@ Improvements
 ------------
 
 * Reject invalid `HELO`, `EHLO`, `MAIL`, and `RCPT` commands.
+* Enforce limits per RFC 5321, section 4.5.3.1.
 
 Changes in FakeSMTPd 0.1.1
 ==========================

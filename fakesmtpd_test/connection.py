@@ -7,8 +7,8 @@ from unittest.mock import patch
 from asserts import assert_equal, assert_greater_equal, fail, \
     assert_is_not_none, assert_datetime_about_now_utc
 
-from fakesmtpd.connection import ConnectionHandler
-from fakesmtpd.smtp import SMTPStatus
+from fakesmtpd.connection import ConnectionHandler, CRLF_LENGTH
+from fakesmtpd.smtp import SMTPStatus, SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT
 from fakesmtpd.state import State
 
 FAKE_HOST = "mail.example.com"
@@ -111,6 +111,21 @@ class ConnectionHandlerTest(TestCase):
         self._handle()
         self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR,
                                       "Command unrecognized")
+
+    def test_command_line_too_long(self) -> None:
+        arg_length = \
+            SMTP_COMMAND_LIMIT - 5 - CRLF_LENGTH  # command + space + <CRLF>
+        self.reader.lines = [f"NOOP {'X' * (arg_length + 1)}"]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR,
+                                      "Line too long.")
+
+    def test_command_line_length_ok(self) -> None:
+        arg_length = \
+            SMTP_COMMAND_LIMIT - 5 - CRLF_LENGTH  # command + space + <CRLF>
+        self.reader.lines = [f"NOOP {'X' * arg_length}"]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.OK, "OK")
 
     def test_noop(self) -> None:
         self.reader.lines = ["NOOP"]
@@ -434,3 +449,15 @@ class ConnectionHandlerTest(TestCase):
         assert_equal("From: f\x76o@example.com\r\n"
                      "\r\n"
                      "B\x64r\r\n", self.printed_state.mail_data)
+
+    def test_data_line_too_long(self) -> None:
+        self.reader.lines = [
+            "EHLO client.example.com",
+            "MAIL FROM:<foo@example.com>",
+            "RCPT TO:<bar@example.com>",
+            "DATA",
+            "a" * (SMTP_TEXT_LINE_LIMIT - 1),
+        ]
+        self._handle()
+        self.writer.assert_last_reply(SMTPStatus.SYNTAX_ERROR,
+                                      "Line too long.")

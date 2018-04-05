@@ -6,12 +6,13 @@ from socket import getfqdn
 from typing import Tuple, Callable
 
 from fakesmtpd.commands import handle_command
-from fakesmtpd.smtp import SMTPStatus
+from fakesmtpd.smtp import SMTPStatus, SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT
 from fakesmtpd.state import State
+
+CRLF_LENGTH = 2
 
 
 class UnexpectedEOFError(Exception):
-
     pass
 
 
@@ -47,31 +48,40 @@ class ConnectionHandler:
                 self._write_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
                                   "Unexpected 8 bit character")
                 continue
-            code = self._handle_line(decoded)
-            if code == SMTPStatus.START_MAIL_INPUT:
-                await self._handle_mail_text()
-            elif code == SMTPStatus.SERVICE_CLOSING:
-                break
+            try:
+                code = self._handle_command_line(decoded)
+            except ValueError:
+                pass
+            else:
+                if code == SMTPStatus.START_MAIL_INPUT:
+                    await self._handle_mail_text()
+                elif code == SMTPStatus.SERVICE_CLOSING:
+                    break
         self.writer.close()
         logging.info("connection closed")
 
-    def _parse_line(self, line: str) -> Tuple[str, str]:
-        command = line[:4].upper()
-        return command, line[5:]
-
-    def _handle_line(self, line: str) -> SMTPStatus:
+    def _handle_command_line(self, line: str) -> SMTPStatus:
         logging.debug(f"received command: {line}")
-        command, arguments = self._parse_line(line)
+        command, arguments = self._parse_command_line(line)
         code, text = handle_command(self.state, command, arguments)
         logging.debug(f"sending response: {code} {text}")
         self._write_reply(code, text)
         return code
+
+    def _parse_command_line(self, line: str) -> Tuple[str, str]:
+        if len(line) + 2 > SMTP_COMMAND_LIMIT:
+            self._write_line_too_long()
+            raise ValueError()
+        command = line[:4].upper()
+        return command, line[5:]
 
     async def _handle_mail_text(self) -> None:
         try:
             await self._read_mail_text()
         except UnexpectedEOFError:
             pass
+        except ValueError:
+            self._write_reply(SMTPStatus.SYNTAX_ERROR, "Line too long.")
         else:
             self._write_reply(SMTPStatus.OK, "OK")
             self.state.date = datetime.datetime.utcnow()
@@ -83,10 +93,15 @@ class ConnectionHandler:
     async def _read_mail_text(self) -> None:
         while not self.reader.at_eof():
             line = await self.reader.readline()
+            if len(line) > SMTP_TEXT_LINE_LIMIT:
+                raise ValueError()
             if line == b".\r\n":
                 return
             self.state.add_line(line.decode("ascii", "7bit"))
         raise UnexpectedEOFError()
+
+    def _write_line_too_long(self) -> None:
+        self._write_reply(SMTPStatus.SYNTAX_ERROR, "Line too long.")
 
     def _write_reply(self, code: SMTPStatus, text: str) -> None:
         full_line = f"{code.value} {text}\r\n"

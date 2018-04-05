@@ -1,7 +1,7 @@
 from socket import getfqdn
 from typing import Tuple
 
-from fakesmtpd.smtp import SMTPStatus
+from fakesmtpd.smtp import SMTPStatus, SYNTAX_ERROR_MSG
 from fakesmtpd.state import State
 from fakesmtpd.syntax import is_valid_domain, is_valid_address_literal, \
     parse_reverse_path, is_valid_smtp_arguments, parse_receiver
@@ -44,8 +44,8 @@ def handle_mail(state: State, arguments: str) -> Reply:
         return handle_wrong_arguments()
     try:
         path, rest = parse_reverse_path(arguments[5:])
-    except ValueError:
-        return handle_wrong_arguments()
+    except ValueError as exc:
+        return handle_wrong_arguments(str(exc))
     if not is_valid_smtp_arguments(rest):
         return handle_wrong_arguments()
     if not state.greeted:
@@ -73,8 +73,8 @@ def handle_rcpt(state: State, arguments: str) -> Reply:
         return handle_wrong_arguments()
     try:
         path, rest = parse_receiver(arguments[3:])
-    except ValueError:
-        return handle_wrong_arguments()
+    except ValueError as exc:
+        return handle_wrong_arguments(str(exc))
     if not is_valid_smtp_arguments(rest):
         return handle_wrong_arguments()
     if not state.rcpt_allowed:
@@ -106,8 +106,8 @@ def handle_missing_arguments() -> Reply:
     return SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Missing arguments"
 
 
-def handle_wrong_arguments() -> Reply:
-    return SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, "Syntax error in arguments"
+def handle_wrong_arguments(msg: str = "") -> Reply:
+    return SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, msg or SYNTAX_ERROR_MSG
 
 
 def handle_bad_command_sequence() -> Reply:
