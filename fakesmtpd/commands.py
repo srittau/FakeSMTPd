@@ -4,8 +4,7 @@ from typing import Tuple
 from fakesmtpd.smtp import SMTPStatus
 from fakesmtpd.state import State
 from fakesmtpd.syntax import is_valid_domain, is_valid_address_literal, \
-    parse_reverse_path, parse_forward_path, is_valid_smtp_arguments, \
-    parse_receiver
+    parse_reverse_path, is_valid_smtp_arguments, parse_receiver
 
 Reply = Tuple[SMTPStatus, str]
 
