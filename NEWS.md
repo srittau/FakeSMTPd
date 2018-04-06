@@ -1,3 +1,11 @@
+Changes in FakeSMTPd 0.2.1
+==========================
+
+Bug fixes
+---------
+
+* Log exceptions raised during a connection, instead of aborting.
+
 Changes in FakeSMTPd 0.2.0
 ==========================
 

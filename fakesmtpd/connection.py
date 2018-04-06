@@ -38,6 +38,14 @@ class ConnectionHandler:
 
     async def handle(self) -> None:
         logging.info("connection opened")
+        try:
+            await self._handle_connection()
+        except Exception as exc:
+            logging.warning(str(exc))
+        finally:
+            logging.info("connection closed")
+
+    async def _handle_connection(self) -> None:
         self._write_reply(SMTPStatus.SERVICE_READY,
                           "{} FakeSMTPd Service ready".format(getfqdn()))
         while not self.reader.at_eof():
@@ -58,7 +66,6 @@ class ConnectionHandler:
                 elif code == SMTPStatus.SERVICE_CLOSING:
                     break
         self.writer.close()
-        logging.info("connection closed")
 
     def _handle_command_line(self, line: str) -> SMTPStatus:
         logging.debug(f"received command: {line}")
