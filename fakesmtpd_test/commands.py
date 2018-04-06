@@ -6,6 +6,9 @@ from asserts import assert_true, assert_equal
 from fakesmtpd.commands import handle_helo, handle_ehlo, handle_mail, \
     handle_rcpt
 from fakesmtpd.smtp import SMTPStatus
+from fakesmtpd.smtp import SMTP_DOMAIN_LIMIT
+from fakesmtpd.smtp import SMTP_LOCAL_PART_LIMIT
+from fakesmtpd.smtp import SMTP_PATH_LIMIT
 from fakesmtpd.state import State
 
 
@@ -124,6 +127,18 @@ class MAILTest(TestCase):
         assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
         assert_equal("Syntax error in arguments", message)
 
+    def test_path_too_long(self) -> None:
+        code, message = handle_mail(
+            State(), f"FROM:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>")
+        assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
+        assert_equal("Path too long", message)
+
+    def test_local_part_too_long(self) -> None:
+        code, message = handle_mail(
+            State(), f"FROM:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>")
+        assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
+        assert_equal("Path too long", message)
+
     def test_invalid_mailbox(self) -> None:
         code, message = handle_mail(State(), "FROM:<INVALID>")
         assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
@@ -218,6 +233,24 @@ class RCPTTest(TestCase):
         code, message = handle_rcpt(State(), "TO:<>")
         assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
         assert_equal("Syntax error in arguments", message)
+
+    def test_path_too_long(self) -> None:
+        code, message = handle_rcpt(
+            State(), f"TO:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>")
+        assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
+        assert_equal("Path too long", message)
+
+    def test_local_part_too_long(self) -> None:
+        code, message = handle_rcpt(
+            State(), f"TO:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>")
+        assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
+        assert_equal("Path too long", message)
+
+    def test_domain_too_long(self) -> None:
+        code, message = handle_rcpt(
+            State(), f"TO:<foo@{'a' * (SMTP_DOMAIN_LIMIT + 1)}>")
+        assert_equal(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS, code)
+        assert_equal("Path too long", message)
 
     def test_path_with_trailing_chars(self) -> None:
         code, message = handle_rcpt(State(), "TO:<foo@example.com>foo=bar")
