@@ -1,6 +1,11 @@
 Changes in FakeSMTPd 0.2.1
 ==========================
 
+Improvements
+------------
+
+* Ensure that lines end with \r\n.
+
 Bug fixes
 ---------
 

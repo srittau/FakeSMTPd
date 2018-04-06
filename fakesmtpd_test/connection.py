@@ -20,7 +20,8 @@ class FakeStreamReader:
 
     # SUT Interface
 
-    async def readline(self) -> bytes:
+    async def readuntil(self, separator: bytes = b"\n") -> bytes:
+        assert_equal(b"\r\n", separator)
         if not self.lines:
             return b""
         line = self.lines[0].encode("latin1") + b"\r\n"

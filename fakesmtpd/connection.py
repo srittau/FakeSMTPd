@@ -49,7 +49,7 @@ class ConnectionHandler:
         self._write_reply(SMTPStatus.SERVICE_READY,
                           "{} FakeSMTPd Service ready".format(getfqdn()))
         while not self.reader.at_eof():
-            line = await self.reader.readline()
+            line = await self.reader.readuntil(b"\r\n")
             try:
                 decoded = line.decode("ascii").rstrip()
             except UnicodeDecodeError:
@@ -99,7 +99,7 @@ class ConnectionHandler:
 
     async def _read_mail_text(self) -> None:
         while not self.reader.at_eof():
-            line = await self.reader.readline()
+            line = await self.reader.readuntil(b"\r\n")
             if len(line) > SMTP_TEXT_LINE_LIMIT:
                 raise ValueError()
             if line == b".\r\n":
