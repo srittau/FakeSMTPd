@@ -1,9 +1,11 @@
-import re
 from socket import getfqdn
 from typing import Tuple
 
 from fakesmtpd.smtp import SMTPStatus
 from fakesmtpd.state import State
+from fakesmtpd.syntax import is_valid_domain, is_valid_address_literal, \
+    parse_reverse_path, parse_forward_path, is_valid_smtp_arguments, \
+    parse_receiver
 
 Reply = Tuple[SMTPStatus, str]
 
@@ -22,6 +24,9 @@ def handle_data(state: State, arguments: str) -> Reply:
 def handle_ehlo(state: State, arguments: str) -> Reply:
     if not arguments.strip():
         return handle_missing_arguments()
+    if not is_valid_domain(arguments) and \
+            not is_valid_address_literal(arguments):
+        return handle_wrong_arguments()
     state.greeted = True
     return SMTPStatus.OK, f"{getfqdn()} Hello {arguments}"
 
@@ -29,20 +34,27 @@ def handle_ehlo(state: State, arguments: str) -> Reply:
 def handle_helo(state: State, arguments: str) -> Reply:
     if not arguments.strip():
         return handle_missing_arguments()
+    if not is_valid_domain(arguments):
+        return handle_wrong_arguments()
     state.greeted = True
     return SMTPStatus.OK, f"{getfqdn()} Hello {arguments}"
 
 
 def handle_mail(state: State, arguments: str) -> Reply:
-    m = re.match(r"^FROM:<(.*)>", arguments, re.IGNORECASE)
-    if not m:
+    if arguments[:5].upper() != "FROM:":
+        return handle_wrong_arguments()
+    try:
+        path, rest = parse_reverse_path(arguments[5:])
+    except ValueError:
+        return handle_wrong_arguments()
+    if not is_valid_smtp_arguments(rest):
         return handle_wrong_arguments()
     if not state.greeted:
         return handle_no_greeting()
     if not state.mail_allowed:
         return handle_bad_command_sequence()
     state.clear()
-    state.reverse_path = m.group(1)
+    state.reverse_path = path
     return SMTPStatus.OK, "Sender OK"
 
 
@@ -58,12 +70,17 @@ def handle_quit(state: State, arguments: str) -> Reply:
 
 
 def handle_rcpt(state: State, arguments: str) -> Reply:
-    m = re.match(r"^TO:<(.*)>", arguments, re.IGNORECASE)
-    if not m:
+    if arguments[:3].upper() != "TO:":
+        return handle_wrong_arguments()
+    try:
+        path, rest = parse_receiver(arguments[3:])
+    except ValueError:
+        return handle_wrong_arguments()
+    if not is_valid_smtp_arguments(rest):
         return handle_wrong_arguments()
     if not state.rcpt_allowed:
         return handle_bad_command_sequence()
-    state.add_forward_path(m.group(1))
+    state.add_forward_path(path)
     return SMTPStatus.OK, "Receiver OK"
 
 
