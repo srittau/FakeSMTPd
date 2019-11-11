@@ -11,9 +11,9 @@ class State:
         self.mail_data: Optional[str] = None
 
     def clear(self) -> None:
-        self.reverse_path: Optional[str] = None
-        self.forward_path: Optional[List[str]] = None
-        self.mail_data: Optional[str] = None
+        self.reverse_path = None
+        self.forward_path = None
+        self.mail_data = None
 
     def add_forward_path(self, path: str) -> None:
         if self.forward_path is None:
