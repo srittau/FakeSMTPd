@@ -1,7 +1,8 @@
-build
-dist
+/build
+/dist
 
-.mypy_cache
+/.mypy_cache
+/.venv*
 
 *.egg-info
 *.eggs
