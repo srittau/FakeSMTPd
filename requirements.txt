@@ -1,4 +1,4 @@
 asserts==0.8.1
 flake8==3.5.0
 mypy==0.580
-wheel==0.31.0
+wheel==0.33.6
