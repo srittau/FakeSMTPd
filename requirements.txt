@@ -1,6 +1,6 @@
 asserts==0.10.0
 flake8==3.7.9
-mypy==0.760
+mypy==0.761
 wheel==0.33.6
 
 # Transitive dependencies
