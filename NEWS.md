@@ -1,3 +1,8 @@
+Changes in FakeSMTPd 1.0.0
+==========================
+
+No changes.
+
 Changes in FakeSMTPd 0.2.1
 ==========================
 

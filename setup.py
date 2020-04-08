@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name="FakeSMTPd",
-    version="0.2.1",
+    version="1.0.0",
     description="SMTP server for testing mail functionality",
     long_description=read("README.md"),
     author="Sebastian Rittau",
@@ -21,7 +21,7 @@ setup(
     tests_require=["asserts >= 0.6"],
     license="MIT",
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
