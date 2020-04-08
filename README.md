@@ -1,6 +1,7 @@
 # FakeSMTPd
 
 [![License](https://img.shields.io/pypi/l/FakeSMTPd.svg)](https://pypi.python.org/pypi/FakeSMTPd/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fakesmtpd)
 [![GitHub Release](https://img.shields.io/github/release/srittau/fakesmtpd/all.svg)](https://github.com/srittau/FakeSMTPd/releases/)
 [![pypi Release](https://img.shields.io/pypi/v/FakeSMTPd.svg)](https://pypi.python.org/pypi/FakeSMTPd/)
 [![Build Status](https://travis-ci.org/srittau/FakeSMTPd.svg?branch=master)](https://travis-ci.org/srittau/FakeSMTPd)
