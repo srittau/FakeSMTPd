@@ -13,6 +13,7 @@ setup(
     version="1.0.0",
     description="SMTP server for testing mail functionality",
     long_description=read("README.md"),
+    long_description_content_type="text/markdown",
     author="Sebastian Rittau",
     author_email="srittau@rittau.biz",
     url="https://github.com/srittau/fakesmtpd",
