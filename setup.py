@@ -19,7 +19,7 @@ setup(
     url="https://github.com/srittau/fakesmtpd",
     packages=["fakesmtpd", "fakesmtpd_test"],
     scripts=[os.path.join("bin", "fakesmtpd")],
-    tests_require=["asserts >= 0.6"],
+    tests_require=["asserts >= 0.6, < 0.12"],
     license="MIT",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
