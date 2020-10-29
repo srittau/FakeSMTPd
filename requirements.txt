@@ -1,5 +1,5 @@
 # Direct dependencies
-asserts==0.11.0
+asserts==0.11.1
 flake8==3.8.4
 mypy==0.790
 wheel==0.35.1
