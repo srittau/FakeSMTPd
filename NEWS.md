@@ -1,3 +1,8 @@
+Unreleased Changes
+==================
+
+* Drop support for Python 3.6.
+
 Changes in FakeSMTPd 1.0.0
 ==========================
 
