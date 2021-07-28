@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name="FakeSMTPd",
-    version="1.0.0",
+    version="2021.7.1",
     description="SMTP server for testing mail functionality",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",

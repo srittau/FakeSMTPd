@@ -1,6 +1,7 @@
 Unreleased Changes
 ==================
 
+* Switch to calendar-based versioning.
 * Drop support for Python 3.6.
 
 Changes in FakeSMTPd 1.0.0
