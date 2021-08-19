@@ -3,10 +3,10 @@ import datetime
 import logging
 from asyncio.streams import StreamReader, StreamWriter
 from socket import getfqdn
-from typing import Tuple, Callable
+from typing import Callable, Tuple
 
 from fakesmtpd.commands import handle_command
-from fakesmtpd.smtp import SMTPStatus, SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT
+from fakesmtpd.smtp import SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT, SMTPStatus
 from fakesmtpd.state import State
 
 CRLF_LENGTH = 2
@@ -18,8 +18,8 @@ class UnexpectedEOFError(Exception):
 
 def replace_by_7_bit(error: UnicodeError) -> Tuple[str, int]:
     if isinstance(error, UnicodeDecodeError):
-        b = error.object[error.start:error.end]
-        c = chr(ord(b) & 0x7f)
+        b = error.object[error.start : error.end]
+        c = chr(ord(b) & 0x7F)
         return c, error.end
     else:
         raise NotImplementedError()
@@ -29,8 +29,12 @@ codecs.register_error("7bit", replace_by_7_bit)
 
 
 class ConnectionHandler:
-    def __init__(self, reader: StreamReader, writer: StreamWriter,
-                 print_mail: Callable[[State], None]) -> None:
+    def __init__(
+        self,
+        reader: StreamReader,
+        writer: StreamWriter,
+        print_mail: Callable[[State], None],
+    ) -> None:
         self.reader = reader
         self.writer = writer
         self.print_mail = print_mail
@@ -46,15 +50,19 @@ class ConnectionHandler:
             logging.info("connection closed")
 
     async def _handle_connection(self) -> None:
-        self._write_reply(SMTPStatus.SERVICE_READY,
-                          "{} FakeSMTPd Service ready".format(getfqdn()))
+        self._write_reply(
+            SMTPStatus.SERVICE_READY,
+            "{} FakeSMTPd Service ready".format(getfqdn()),
+        )
         while not self.reader.at_eof():
             line = await self.reader.readuntil(b"\r\n")
             try:
                 decoded = line.decode("ascii").rstrip()
             except UnicodeDecodeError:
-                self._write_reply(SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
-                                  "Unexpected 8 bit character")
+                self._write_reply(
+                    SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS,
+                    "Unexpected 8 bit character",
+                )
                 continue
             try:
                 code = self._handle_command_line(decoded)

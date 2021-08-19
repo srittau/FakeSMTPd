@@ -1,8 +1,13 @@
 import re
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
 
-from fakesmtpd.smtp import SYNTAX_ERROR_MSG, PATH_TOO_LONG_MSG, \
-    SMTP_LOCAL_PART_LIMIT, SMTP_DOMAIN_LIMIT, SMTP_PATH_LIMIT
+from fakesmtpd.smtp import (
+    PATH_TOO_LONG_MSG,
+    SMTP_DOMAIN_LIMIT,
+    SMTP_LOCAL_PART_LIMIT,
+    SMTP_PATH_LIMIT,
+    SYNTAX_ERROR_MSG,
+)
 
 _LET_DIG = r"[a-zA-Z0-9]"
 _LDH_STR = f"[a-zA-Z0-9-]*{_LET_DIG}"
@@ -12,7 +17,7 @@ _ATOM = r"[0-9a-zA-Z!#$%&'*+/=?^_`{}|~-]+"
 _DOT_STRING = f"{_ATOM}(\\.{_ATOM})*"
 _Q_TEXT_SMTP = r"[ !#-\[\]-~]"
 _QP_SMTP = r"\\[ -~]"
-_QUOTED_STRING = f"\"(({_Q_TEXT_SMTP})|({_QP_SMTP}))*\""
+_QUOTED_STRING = f'"(({_Q_TEXT_SMTP})|({_QP_SMTP}))*"'
 
 _SUB_DOMAIN = f"{_LET_DIG}({_LDH_STR})?"
 _DOMAIN = f"{_SUB_DOMAIN}(\\.{_SUB_DOMAIN})*"
@@ -23,9 +28,10 @@ _ADDRESS_LITERAL = r"\[(.*)\]"
 _IPV6_FULL = f"{_IPV6_HEX}(:{_IPV6_HEX}){{7}}"
 _IPV6_COMP = f"({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*)?"
 _IPV6V4_FULL = f"{_IPV6_HEX}(:{_IPV6_HEX}){{5}}:({_IPV4_LITERAL})"
-_IPV6V4_COMP = \
-    f"(({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*:)?)" \
+_IPV6V4_COMP = (
+    f"(({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*:)?)"
     f"({_IPV4_LITERAL})"
+)
 
 _ESMTP_PARAM = "([a-zA-Z0-9][a-zA-Z0-9-]*)(=([!-<>-~]+))?"
 
@@ -99,7 +105,7 @@ def parse_path(s: str) -> Tuple[str, str]:
     if len(path) + 2 > SMTP_PATH_LIMIT:
         raise ValueError(PATH_TOO_LONG_MSG)
     _validate_mailbox(path)
-    return path, s[len(path) + 2:]
+    return path, s[len(path) + 2 :]
 
 
 def _validate_mailbox(s: str) -> None:

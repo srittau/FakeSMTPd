@@ -3,9 +3,8 @@ import logging
 import signal
 import sys
 from asyncio.streams import StreamReader, StreamWriter
-from typing import Callable, Optional, Awaitable
-
 from functools import partial
+from typing import Awaitable, Callable, Optional
 
 from fakesmtpd.args import parse_args
 from fakesmtpd.connection import ConnectionHandler
@@ -24,8 +23,9 @@ def main() -> None:
         sys.exit(1)
 
 
-_ServerHandler = \
-    Callable[[StreamReader, StreamWriter], Optional[Awaitable[None]]]
+_ServerHandler = Callable[
+    [StreamReader, StreamWriter], Optional[Awaitable[None]]
+]
 
 
 def run_server(host: str, port: int, handler: _ServerHandler) -> None:
@@ -37,7 +37,9 @@ def run_server(host: str, port: int, handler: _ServerHandler) -> None:
     loop.run_forever()
 
 
-async def handle_connection(printer: Callable[[State], None],
-                            reader: StreamReader,
-                            writer: StreamWriter) -> None:
+async def handle_connection(
+    printer: Callable[[State], None],
+    reader: StreamReader,
+    writer: StreamWriter,
+) -> None:
     await ConnectionHandler(reader, writer, printer).handle()

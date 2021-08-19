@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, List
+from typing import List, Optional
 
 
 class State:
@@ -27,15 +27,26 @@ class State:
 
     @property
     def mail_allowed(self) -> bool:
-        return (self.greeted and self.reverse_path is None
-                and self.forward_path is None and self.mail_data is None)
+        return (
+            self.greeted
+            and self.reverse_path is None
+            and self.forward_path is None
+            and self.mail_data is None
+        )
 
     @property
     def rcpt_allowed(self) -> bool:
-        return (self.greeted and self.reverse_path is not None
-                and self.mail_data is None)
+        return (
+            self.greeted
+            and self.reverse_path is not None
+            and self.mail_data is None
+        )
 
     @property
     def data_allowed(self) -> bool:
-        return (self.greeted and self.reverse_path is not None
-                and self.forward_path is not None and self.mail_data is None)
+        return (
+            self.greeted
+            and self.reverse_path is not None
+            and self.forward_path is not None
+            and self.mail_data is None
+        )

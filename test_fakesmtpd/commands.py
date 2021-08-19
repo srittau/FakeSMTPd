@@ -3,18 +3,26 @@ from unittest.mock import Mock
 import pytest
 from pytest_mock import MockerFixture
 
-from fakesmtpd.commands import handle_helo, handle_ehlo, handle_mail, \
-    handle_rcpt
-from fakesmtpd.smtp import SMTPStatus
-from fakesmtpd.smtp import SMTP_DOMAIN_LIMIT
-from fakesmtpd.smtp import SMTP_LOCAL_PART_LIMIT
-from fakesmtpd.smtp import SMTP_PATH_LIMIT
+from fakesmtpd.commands import (
+    handle_ehlo,
+    handle_helo,
+    handle_mail,
+    handle_rcpt,
+)
+from fakesmtpd.smtp import (
+    SMTP_DOMAIN_LIMIT,
+    SMTP_LOCAL_PART_LIMIT,
+    SMTP_PATH_LIMIT,
+    SMTPStatus,
+)
 from fakesmtpd.state import State
+
 
 @pytest.fixture(autouse=True)
 def getfqdn(mocker: MockerFixture) -> Mock:
     return mocker.patch(
-        "fakesmtpd.commands.getfqdn", return_value="smtp.example.com",
+        "fakesmtpd.commands.getfqdn",
+        return_value="smtp.example.com",
     )
 
 
@@ -92,8 +100,9 @@ class TestMAIL:
     def test_with_arguments(self) -> None:
         state = State()
         state.greeted = True
-        code, message = handle_mail(state,
-                                    "FROM:<foo@example.com> foo=bar abc")
+        code, message = handle_mail(
+            state, "FROM:<foo@example.com> foo=bar abc"
+        )
         assert code == SMTPStatus.OK
         assert message == "Sender OK"
         assert state.reverse_path == "foo@example.com"
@@ -101,8 +110,9 @@ class TestMAIL:
     def test_with_arguments_and_quoted_local_part(self) -> None:
         state = State()
         state.greeted = True
-        code, message = handle_mail(state,
-                                    'FROM:<"foo bar"@example.com> foo=bar')
+        code, message = handle_mail(
+            state, 'FROM:<"foo bar"@example.com> foo=bar'
+        )
         assert code == SMTPStatus.OK
         assert message == "Sender OK"
         assert state.reverse_path == '"foo bar"@example.com'
@@ -119,13 +129,15 @@ class TestMAIL:
 
     def test_path_too_long(self) -> None:
         code, message = handle_mail(
-            State(), f"FROM:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>")
+            State(), f"FROM:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>"
+        )
         assert code == SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS
         assert message == "Path too long"
 
     def test_local_part_too_long(self) -> None:
         code, message = handle_mail(
-            State(), f"FROM:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>")
+            State(), f"FROM:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>"
+        )
         assert code == SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS
         assert message == "Path too long"
 
@@ -225,19 +237,22 @@ class TestRCPT:
 
     def test_path_too_long(self) -> None:
         code, message = handle_rcpt(
-            State(), f"TO:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>")
+            State(), f"TO:<{'a' * 60}@{'a' * (SMTP_PATH_LIMIT - 61)}>"
+        )
         assert code == SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS
         assert message == "Path too long"
 
     def test_local_part_too_long(self) -> None:
         code, message = handle_rcpt(
-            State(), f"TO:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>")
+            State(), f"TO:<{'a' * (SMTP_LOCAL_PART_LIMIT + 1)}@example.com>"
+        )
         assert code == SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS
         assert message == "Path too long"
 
     def test_domain_too_long(self) -> None:
         code, message = handle_rcpt(
-            State(), f"TO:<foo@{'a' * (SMTP_DOMAIN_LIMIT + 1)}>")
+            State(), f"TO:<foo@{'a' * (SMTP_DOMAIN_LIMIT + 1)}>"
+        )
         assert code == SMTPStatus.SYNTAX_ERROR_IN_PARAMETERS
         assert message == "Path too long"
 

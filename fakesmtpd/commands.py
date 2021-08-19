@@ -1,10 +1,15 @@
 from socket import getfqdn
 from typing import Tuple
 
-from fakesmtpd.smtp import SMTPStatus, SYNTAX_ERROR_MSG
+from fakesmtpd.smtp import SYNTAX_ERROR_MSG, SMTPStatus
 from fakesmtpd.state import State
-from fakesmtpd.syntax import is_valid_domain, is_valid_address_literal, \
-    parse_reverse_path, is_valid_smtp_arguments, parse_receiver
+from fakesmtpd.syntax import (
+    is_valid_address_literal,
+    is_valid_domain,
+    is_valid_smtp_arguments,
+    parse_receiver,
+    parse_reverse_path,
+)
 
 Reply = Tuple[SMTPStatus, str]
 
@@ -23,8 +28,9 @@ def handle_data(state: State, arguments: str) -> Reply:
 def handle_ehlo(state: State, arguments: str) -> Reply:
     if not arguments.strip():
         return handle_missing_arguments()
-    if not is_valid_domain(arguments) and \
-            not is_valid_address_literal(arguments):
+    if not is_valid_domain(arguments) and not is_valid_address_literal(
+        arguments
+    ):
         return handle_wrong_arguments()
     state.greeted = True
     return SMTPStatus.OK, f"{getfqdn()} Hello {arguments}"

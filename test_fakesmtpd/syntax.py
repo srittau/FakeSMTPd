@@ -1,8 +1,12 @@
 from unittest import TestCase
 
 import pytest
-from fakesmtpd.syntax import (is_valid_address_literal, parse_path,
-                              parse_reverse_path)
+
+from fakesmtpd.syntax import (
+    is_valid_address_literal,
+    parse_path,
+    parse_reverse_path,
+)
 
 
 class TestAddressLiteral:
