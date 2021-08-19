@@ -2,17 +2,22 @@
 asserts==0.11.1
 flake8==3.9.2
 mypy==0.910
+pytest==6.2.4
 
 # Build dependencies
 build==0.6.0.post1
 wheel==0.37.0
 
 # Transitive dependencies
+attrs==21.2.0
 entrypoints==0.3
+iniconfig==1.1.1
 mccabe==0.6.1
 mypy-extensions==0.4.3
 packaging==21.0
 pep517==0.11.0
+pluggy==0.13.1
+py==1.10.0
 pycodestyle==2.7.0
 pyflakes==2.3.1
 tomli==1.2.1

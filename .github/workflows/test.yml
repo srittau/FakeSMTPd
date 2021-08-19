@@ -30,4 +30,4 @@ jobs:
             mypy --version
             mypy fakesmtpd fakesmtpd_test
         - name: Test with unittest
-          run: python -Wall -m unittest discover -t . -s fakesmtpd_test -p "*.py"
+          run: pytest
