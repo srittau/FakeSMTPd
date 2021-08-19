@@ -29,5 +29,5 @@ jobs:
           run: |
             mypy --version
             mypy fakesmtpd test_fakesmtpd
-        - name: Test with unittest
+        - name: Test with pytest
           run: pytest

@@ -5,7 +5,9 @@ import datetime
 import logging
 from collections.abc import Callable
 from socket import getfqdn
-from typing import Any, Protocol
+from typing import Any
+
+from typing_extensions import Protocol
 
 from fakesmtpd.commands import handle_command
 from fakesmtpd.smtp import SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT, SMTPStatus
