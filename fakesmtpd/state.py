@@ -1,14 +1,15 @@
+from __future__ import annotations
+
 import datetime
-from typing import List, Optional
 
 
 class State:
     def __init__(self) -> None:
         self.greeted = False
-        self.date: Optional[datetime.datetime] = None
-        self.reverse_path: Optional[str] = None
-        self.forward_path: Optional[List[str]] = None
-        self.mail_data: Optional[str] = None
+        self.date: datetime.datetime | None = None
+        self.reverse_path: str | None = None
+        self.forward_path: list[str] | None = None
+        self.mail_data: str | None = None
 
     def clear(self) -> None:
         self.reverse_path = None

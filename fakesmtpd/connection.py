@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import codecs
 import datetime
 import logging
-from asyncio.streams import StreamReader, StreamWriter
+from collections.abc import Callable
 from socket import getfqdn
-from typing import Callable, Tuple
+from typing import Any, Protocol
 
 from fakesmtpd.commands import handle_command
 from fakesmtpd.smtp import SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT, SMTPStatus
@@ -12,11 +14,27 @@ from fakesmtpd.state import State
 CRLF_LENGTH = 2
 
 
+class _StreamWriterProto(Protocol):
+    def write(self, __b: bytes) -> Any:
+        ...
+
+    def close(self) -> Any:
+        ...
+
+
+class _StreamReaderProto(Protocol):
+    def at_eof(self) -> bool:
+        ...
+
+    async def readuntil(self, __until: bytes) -> bytes:
+        ...
+
+
 class UnexpectedEOFError(Exception):
     pass
 
 
-def replace_by_7_bit(error: UnicodeError) -> Tuple[str, int]:
+def replace_by_7_bit(error: UnicodeError) -> tuple[str, int]:
     if isinstance(error, UnicodeDecodeError):
         b = error.object[error.start : error.end]
         c = chr(ord(b) & 0x7F)
@@ -31,8 +49,8 @@ codecs.register_error("7bit", replace_by_7_bit)
 class ConnectionHandler:
     def __init__(
         self,
-        reader: StreamReader,
-        writer: StreamWriter,
+        reader: _StreamReaderProto,
+        writer: _StreamWriterProto,
         print_mail: Callable[[State], None],
     ) -> None:
         self.reader = reader
@@ -83,7 +101,7 @@ class ConnectionHandler:
         self._write_reply(code, text)
         return code
 
-    def _parse_command_line(self, line: str) -> Tuple[str, str]:
+    def _parse_command_line(self, line: str) -> tuple[str, str]:
         if len(line) + 2 > SMTP_COMMAND_LIMIT:
             self._write_line_too_long()
             raise ValueError()

@@ -1,9 +1,8 @@
 import argparse
 from smtplib import SMTP_PORT
-from typing import Any
 
 
-def parse_args() -> Any:
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="SMTP server for testing mail functionality"
     )

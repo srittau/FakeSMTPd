@@ -1,7 +1,15 @@
 import sys
-from typing import IO
+from typing import Any, Protocol
 
 from fakesmtpd.state import State
+
+
+class _MBoxWriter(Protocol):
+    def write(self, __s: str) -> Any:
+        ...
+
+    def flush(self) -> Any:
+        ...
 
 
 def print_mbox_mail(filename: str, state: State) -> None:
@@ -13,7 +21,7 @@ def print_mbox_mail(filename: str, state: State) -> None:
             write_mbox_mail(f, state)
 
 
-def write_mbox_mail(stream: IO[str], state: State) -> None:
+def write_mbox_mail(stream: _MBoxWriter, state: State) -> None:
     assert state.date is not None
     assert state.forward_path is not None
     assert state.mail_data is not None

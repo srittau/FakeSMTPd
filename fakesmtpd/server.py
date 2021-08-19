@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import signal
 import sys
 from asyncio.streams import StreamReader, StreamWriter
+from collections.abc import Awaitable, Callable
 from functools import partial
-from typing import Awaitable, Callable, Optional
+from typing import Optional
 
 from fakesmtpd.args import parse_args
 from fakesmtpd.connection import ConnectionHandler

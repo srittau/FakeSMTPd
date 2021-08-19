@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import datetime
-from asyncio.streams import StreamReader, StreamWriter
-from typing import List, cast
 
 import pytest
 from pytest_mock import MockerFixture
@@ -17,7 +15,7 @@ FAKE_HOST = "mail.example.com"
 
 class FakeStreamReader:
     def __init__(self) -> None:
-        self.lines: List[str] = []
+        self.lines: list[str] = []
 
     # SUT Interface
 
@@ -58,7 +56,7 @@ class FakeStreamWriter:
             pytest.fail("writer unexpectedly still open")
 
     @property
-    def lines(self) -> List[str]:
+    def lines(self) -> list[str]:
         return self.data.decode("ascii").splitlines()
 
     def assert_last_line_equal(self, line: str) -> None:
@@ -81,11 +79,7 @@ class TestConnectionHandler:
         reader.lines = lines
         writer = FakeStreamWriter()
         loop = asyncio.get_event_loop()
-        handler = ConnectionHandler(
-            cast(StreamReader, reader),
-            cast(StreamWriter, writer),
-            self._print_mail,
-        )
+        handler = ConnectionHandler(reader, writer, self._print_mail)
         loop.run_until_complete(handler.handle())
         return writer
 

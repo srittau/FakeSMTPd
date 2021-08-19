@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import re
-from typing import List, Optional, Tuple
 
 from fakesmtpd.smtp import (
     PATH_TOO_LONG_MSG,
@@ -97,7 +98,7 @@ def is_valid_ipv6_address(s: str) -> bool:
     return False
 
 
-def parse_path(s: str) -> Tuple[str, str]:
+def parse_path(s: str) -> tuple[str, str]:
     m = re.match(r"^<(.*)>", s)
     if not m:
         raise ValueError(SYNTAX_ERROR_MSG)
@@ -139,7 +140,7 @@ def _validate_domain_part(s: str) -> None:
         raise ValueError(SYNTAX_ERROR_MSG)
 
 
-def parse_reverse_path(s: str) -> Tuple[str, str]:
+def parse_reverse_path(s: str) -> tuple[str, str]:
     if s.startswith("<>"):
         return "", s[2:]
     return parse_path(s)
@@ -148,7 +149,7 @@ def parse_reverse_path(s: str) -> Tuple[str, str]:
 parse_forward_path = parse_path
 
 
-def parse_receiver(s: str) -> Tuple[str, str]:
+def parse_receiver(s: str) -> tuple[str, str]:
     if s[:12].lower() == "<postmaster>":
         return s[1:11], s[12:]
     return parse_forward_path(s)
@@ -165,11 +166,11 @@ def is_valid_smtp_arguments(s: str) -> bool:
     return True
 
 
-def parse_smtp_arguments(s: str) -> List[Tuple[str, Optional[str]]]:
+def parse_smtp_arguments(s: str) -> list[tuple[str, str | None]]:
     return [_parse_estm_param(sub) for sub in s.split(" ")]
 
 
-def _parse_estm_param(s: str) -> Tuple[str, Optional[str]]:
+def _parse_estm_param(s: str) -> tuple[str, str | None]:
     m = _esmtp_param_re.match(s)
     if not m:
         raise ValueError(SYNTAX_ERROR_MSG)
