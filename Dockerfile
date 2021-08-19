@@ -17,7 +17,6 @@ RUN ./virtualenv/bin/pip install -r requirements.txt
 COPY README.md setup.py ./
 COPY bin/ ./bin
 COPY fakesmtpd/ ./fakesmtpd
-COPY test_fakesmtpd/ ./test_fakesmtpd
 RUN ./virtualenv/bin/pip install .
 
 # Start eventstreamd
