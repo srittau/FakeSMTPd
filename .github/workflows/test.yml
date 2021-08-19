@@ -24,10 +24,10 @@ jobs:
         - name: Lint with flake8
           run: |
             flake8 --version
-            flake8 --show-source --statistics fakesmtpd fakesmtpd_test
+            flake8 --show-source --statistics fakesmtpd test_fakesmtpd
         - name: Type check with mypy
           run: |
             mypy --version
-            mypy fakesmtpd fakesmtpd_test
+            mypy fakesmtpd test_fakesmtpd
         - name: Test with unittest
           run: pytest
