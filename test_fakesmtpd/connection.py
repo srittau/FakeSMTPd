@@ -1,18 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 from asyncio.streams import StreamReader, StreamWriter
-from typing import List, Optional, cast
-from unittest.mock import Mock
+from typing import List, cast
 
 import pytest
-from asserts import (
-    assert_datetime_about_now_utc,
-    assert_equal,
-    assert_greater_equal,
-    assert_is_not_none,
-    fail,
-)
 from pytest_mock import MockerFixture
 
 from fakesmtpd.connection import CRLF_LENGTH, ConnectionHandler
@@ -29,7 +22,7 @@ class FakeStreamReader:
     # SUT Interface
 
     async def readuntil(self, separator: bytes = b"\n") -> bytes:
-        assert_equal(b"\r\n", separator)
+        assert separator == b"\r\n"
         if not self.lines:
             return b""
         line = self.lines[0].encode("latin1") + b"\r\n"
@@ -62,15 +55,15 @@ class FakeStreamWriter:
 
     def assert_is_closed(self) -> None:
         if self.open:
-            fail("writer unexpectedly still open")
+            pytest.fail("writer unexpectedly still open")
 
     @property
     def lines(self) -> List[str]:
         return self.data.decode("ascii").splitlines()
 
     def assert_last_line_equal(self, line: str) -> None:
-        assert_greater_equal(len(self.lines), 1, "no response")
-        assert_equal(line, self.lines[-1])
+        assert len(self.lines) >= 1, "no response"
+        assert self.lines[-1] == line
 
     def assert_last_reply(self, code: SMTPStatus, text: str) -> None:
         expected_line = f"{code.value} {text}"
@@ -82,9 +75,6 @@ class TestConnectionHandler:
     def getfqdn(self, mocker: MockerFixture) -> None:
         mocker.patch("fakesmtpd.connection.getfqdn", lambda: FAKE_HOST)
         mocker.patch("fakesmtpd.commands.getfqdn", lambda: FAKE_HOST)
-
-    # def setUp(self) -> None:
-    #     self.printed_state: Optional[State] = None
 
     def _handle(self, lines: list[str] = []) -> FakeStreamWriter:
         reader = FakeStreamReader()
@@ -429,7 +419,7 @@ class TestConnectionHandler:
         writer.assert_last_reply(SMTPStatus.CANNOT_VRFY, "Verify not allowed")
 
     def test_mail_printed(self) -> None:
-        writer = self._handle(
+        self._handle(
             [
                 "EHLO client.example.com",
                 "MAIL FROM:<foo@example.com>",
@@ -445,22 +435,20 @@ class TestConnectionHandler:
                 ".",
             ]
         )
-        assert_is_not_none(self.printed_state)
         assert self.printed_state is not None
-        assert_datetime_about_now_utc(self.printed_state.date)
-        assert_equal("foo@example.com", self.printed_state.reverse_path)
-        assert_equal(
-            ["bar1@example.com", "bar2@example.com"],
-            self.printed_state.forward_path,
-        )
-        assert_equal(
+        assert isinstance(self.printed_state.date, datetime.datetime)
+        assert self.printed_state.reverse_path == "foo@example.com"
+        assert self.printed_state.forward_path == [
+            "bar1@example.com",
+            "bar2@example.com",
+        ]
+        assert self.printed_state.mail_data == (
             "From: foo@example.com\r\n"
             "To: bar@example.com\r\n"
             "Subject: Foobar\r\n"
             "\r\n"
             "Line 1  \r\n"
-            "Line 2\r\n",
-            self.printed_state.mail_data,
+            "Line 2\r\n"
         )
 
     def test_8bit_command(self) -> None:
@@ -470,7 +458,7 @@ class TestConnectionHandler:
         )
 
     def test_8bit_text(self) -> None:
-        writer = self._handle(
+        self._handle(
             [
                 "EHLO client.example.com",
                 "MAIL FROM:<foo@example.com>",
@@ -483,9 +471,8 @@ class TestConnectionHandler:
             ]
         )
         assert self.printed_state is not None
-        assert_equal(
-            "From: f\x76o@example.com\r\n" "\r\n" "B\x64r\r\n",
-            self.printed_state.mail_data,
+        assert self.printed_state.mail_data == (
+            "From: f\x76o@example.com\r\n" "\r\n" "B\x64r\r\n"
         )
 
     def test_data_line_too_long(self) -> None:
