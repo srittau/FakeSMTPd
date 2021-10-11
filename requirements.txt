@@ -13,7 +13,7 @@ wheel==0.37.0
 # Transitive dependencies
 appdirs==1.4.4
 attrs==21.2.0
-click==8.0.1
+click==8.0.3
 entrypoints==0.3
 iniconfig==1.1.1
 mccabe==0.6.1
