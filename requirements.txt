@@ -21,7 +21,7 @@ pathspec==0.9.0
 pep517==0.12.0
 platformdirs==2.4.0
 pluggy==1.0.0
-py==1.10.0
+py==1.11.0
 pycodestyle==2.8.0
 pyflakes==2.4.0
 pyparsing==2.4.7
