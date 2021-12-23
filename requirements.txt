@@ -8,7 +8,7 @@ pytest-mock==3.6.1
 
 # Build dependencies
 build==0.7.0
-wheel==0.37.0
+wheel==0.37.1
 
 # Transitive dependencies
 attrs==21.2.0
