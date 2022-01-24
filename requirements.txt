@@ -14,7 +14,7 @@ wheel==0.37.1
 attrs==21.4.0
 click==8.0.3
 iniconfig==1.1.1
-mccabe==0.6.1
+mccabe==0.7.0
 mypy-extensions==0.4.3
 packaging==21.3
 pathspec==0.9.0
