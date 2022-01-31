@@ -1,6 +1,32 @@
-[build-system]
-requires = ["setuptools >= 40.9", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.poetry]
+name = "FakeSMTPd"
+version = "2021.8.19.dev1"
+description = "SMTP server for testing mail functionality"
+authors = ["Sebastian Rittau <srittau@rittau.biz>"]
+license = "MIT"
+homepage = "https://github.com/srittau/fakesmtpd"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Communications :: Email :: Mail Transport Agents",
+    "Topic :: Software Development :: Testing",
+]
+packages = [{ include = "fakesmtpd" }, { include = "test_fakesmtpd" }]
+
+[tool.poetry.scripts]
+fakesmtpd = "fakesmtpd.server:main"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+typing-extensions = "^4.0.1"
+
+[tool.poetry.dev-dependencies]
+black = "21.12b0"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "0.931"
+pytest = ">=6.2.4"
+pytest-mock = ">=3.6.1"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
@@ -12,3 +38,7 @@ target-version = ["py37"]
 [tool.isort]
 profile = "black"
 line_length = 79
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
