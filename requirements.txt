@@ -4,7 +4,7 @@ flake8==4.0.1
 isort==5.10.1
 mypy==0.931
 pytest==6.2.5
-pytest-mock==3.6.1
+pytest-mock==3.7.0
 
 # Build dependencies
 build==0.7.0
