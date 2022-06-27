@@ -11,7 +11,7 @@ classifiers = [
     "Topic :: Communications :: Email :: Mail Transport Agents",
     "Topic :: Software Development :: Testing",
 ]
-packages = [{ include = "fakesmtpd" }, { include = "test_fakesmtpd" }]
+packages = [{ include = "fakesmtpd" }]
 
 [tool.poetry.scripts]
 fakesmtpd = "fakesmtpd.server:main"
