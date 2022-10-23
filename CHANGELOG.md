@@ -1,42 +1,34 @@
-Unreleased Changes
-==================
+# Changes in FakeSMTPd 2022.10.1
 
-* Switch to calendar-based versioning.
-* Drop support for Python 3.6.
+- Switch to calendar-based versioning.
+- Officially support Python 3.9 and 3.10.
+- Drop support for Python 3.6.
 
-Changes in FakeSMTPd 1.0.0
-==========================
+# Changes in FakeSMTPd 1.0.0
 
 No changes.
 
-Changes in FakeSMTPd 0.2.1
-==========================
+# Changes in FakeSMTPd 0.2.1
 
-Improvements
-------------
+## Improvements
 
-* Ensure that lines end with \r\n.
+- Ensure that lines end with \r\n.
 
-Bug fixes
----------
+## Bug fixes
 
-* Log exceptions raised during a connection, instead of aborting.
+- Log exceptions raised during a connection, instead of aborting.
 
-Changes in FakeSMTPd 0.2.0
-==========================
+# Changes in FakeSMTPd 0.2.0
 
-Improvements
-------------
+## Improvements
 
-* Reject invalid `HELO`, `EHLO`, `MAIL`, and `RCPT` commands.
-* Enforce limits per RFC 5321, section 4.5.3.1.
+- Reject invalid `HELO`, `EHLO`, `MAIL`, and `RCPT` commands.
+- Enforce limits per RFC 5321, section 4.5.3.1.
 
-Changes in FakeSMTPd 0.1.1
-==========================
+# Changes in FakeSMTPd 0.1.1
 
-Bug fixes
----------
+## Bug fixes
 
-* Do not throw an exception when encountering 8 bit characters. Instead
+- Do not throw an exception when encountering 8 bit characters. Instead
   return an error (in commands) or drop the most significant bit (in mail
   texts).

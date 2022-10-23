@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "FakeSMTPd"
-version = "2021.8.19.dev1"
+version = "2022.10.1"
 description = "SMTP server for testing mail functionality"
 authors = ["Sebastian Rittau <srittau@rittau.biz>"]
 license = "MIT"
