@@ -13,6 +13,11 @@ classifiers = [
 ]
 packages = [{ include = "fakesmtpd" }]
 
+[tool.poetry.urls]
+"GitHub" = "https://github.com/srittau/fakesmtpd"
+"Bug Tracker" = "https://github.com/srittau/fakesmtpd/issues"
+"Changes" = "https://github.com/srittau/fakesmtpd/blob/main/CHANGELOG.md"
+
 [tool.poetry.scripts]
 fakesmtpd = "fakesmtpd.server:main"
 
