@@ -1,3 +1,7 @@
+# Unreleased changes
+
+- Drop support for Python 3.7 and 3.8.
+
 # Changes in FakeSMTPd 2022.10.1
 
 - Switch to calendar-based versioning.
