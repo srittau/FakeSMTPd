@@ -27,7 +27,7 @@ typing-extensions = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
-flake8 = "^5.0.4"
+flake8 = { version = "^6.0.0", python = ">=3.8.1" }
 isort = "^5.10.1"
 mypy = "0.991"
 pytest = ">=6.2.4,<8"
