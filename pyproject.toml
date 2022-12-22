@@ -28,7 +28,7 @@ typing-extensions = "^4.0.1"
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
 flake8 = "^6.0.0"
-isort = "^5.10.1"
+isort = "^5.11.4"
 mypy = "0.991"
 pytest = ">=6.2.4,<8"
 pytest-mock = ">=3.6.1"
