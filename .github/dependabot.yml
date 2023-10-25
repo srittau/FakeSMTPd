@@ -1,13 +1,18 @@
 version: 2
+
 updates:
   - package-ecosystem: pip
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: '04:00'
-    versioning-strategy: lockfile-only
     groups:
       dependencies:
+        exclude-patterns:
+          - "types-*"
         update-types:
           - "minor"
           - "patch"
+      types:
+        patterns:
+          - "types-*"
