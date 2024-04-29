@@ -26,10 +26,10 @@ python = "^3.9"
 typing-extensions = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
-black = "^24.4.0"
+black = "^24.4.2"
 flake8 = "^7.0.0"
 isort = "^5.13.2"
-mypy = "~1.9.0"
+mypy = "~1.10.0"
 pytest = ">=6.2.4,<9"
 pytest-mock = ">=3.6.1"
 
