@@ -115,7 +115,9 @@ class ConnectionHandler:
             self._write_reply(SMTPStatus.SYNTAX_ERROR, "Line too long.")
         else:
             self._write_reply(SMTPStatus.OK, "OK")
-            self.state.date = datetime.datetime.utcnow()
+            self.state.date = datetime.datetime.now(
+                datetime.timezone.utc
+            ).replace(tzinfo=None)
             state = self.state
             self.print_mail(state)
             self.state = State()

@@ -78,9 +78,8 @@ class TestConnectionHandler:
         reader = FakeStreamReader()
         reader.lines = lines if lines is not None else []
         writer = FakeStreamWriter()
-        loop = asyncio.get_event_loop()
         handler = ConnectionHandler(reader, writer, self._print_mail)
-        loop.run_until_complete(handler.handle())
+        asyncio.run(handler.handle())
         return writer
 
     def _print_mail(self, state: State) -> None:
