@@ -113,7 +113,7 @@ def _validate_mailbox(s: str) -> None:
     try:
         local_part, domain = s.split("@")
     except ValueError:
-        raise ValueError(SYNTAX_ERROR_MSG)
+        raise ValueError(SYNTAX_ERROR_MSG) from None
     _validate_local_part(local_part)
     _validate_domain_part(domain)
 

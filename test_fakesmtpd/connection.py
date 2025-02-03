@@ -74,9 +74,9 @@ class TestConnectionHandler:
         mocker.patch("fakesmtpd.connection.getfqdn", lambda: FAKE_HOST)
         mocker.patch("fakesmtpd.commands.getfqdn", lambda: FAKE_HOST)
 
-    def _handle(self, lines: list[str] = []) -> FakeStreamWriter:
+    def _handle(self, lines: list[str] | None = None) -> FakeStreamWriter:
         reader = FakeStreamReader()
-        reader.lines = lines
+        reader.lines = lines if lines is not None else []
         writer = FakeStreamWriter()
         loop = asyncio.get_event_loop()
         handler = ConnectionHandler(reader, writer, self._print_mail)
@@ -466,7 +466,7 @@ class TestConnectionHandler:
         )
         assert self.printed_state is not None
         assert self.printed_state.mail_data == (
-            "From: f\x76o@example.com\r\n" "\r\n" "B\x64r\r\n"
+            "From: f\x76o@example.com\r\n\r\nB\x64r\r\n"
         )
 
     def test_data_line_too_long(self) -> None:

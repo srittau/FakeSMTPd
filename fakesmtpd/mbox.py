@@ -7,11 +7,9 @@ from fakesmtpd.state import State
 
 
 class _MBoxWriter(Protocol):
-    def write(self, __s: str) -> Any:
-        ...
+    def write(self, __s: str) -> Any: ...
 
-    def flush(self) -> Any:
-        ...
+    def flush(self) -> Any: ...
 
 
 def print_mbox_mail(filename: str, state: State) -> None:

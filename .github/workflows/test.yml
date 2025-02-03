@@ -22,10 +22,10 @@ jobs:
         run: pip --disable-pip-version-check install -U poetry
       - name: Install Python packages
         run: poetry install
-      - name: Lint with flake8
+      - name: Lint with ruff
         run: |
-          poetry run flake8 --version
-          poetry run flake8 --show-source --statistics fakesmtpd test_fakesmtpd
+          poetry run ruff --version
+          poetry run ruff check
       - name: Type check with mypy
         run: |
           poetry run mypy --version

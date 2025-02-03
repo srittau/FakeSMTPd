@@ -25,24 +25,21 @@ fakesmtpd = "fakesmtpd.server:main"
 python = "^3.9"
 typing-extensions = "^4.0.1"
 
-[tool.poetry.dev-dependencies]
-black = "^24.10.0"
-flake8 = "^7.1.1"
-isort = "^5.13.2"
+[tool.poetry.group.dev.dependencies]
 mypy = "~1.14.1"
 pytest = ">=6.2.4,<9"
 pytest-mock = ">=3.6.1"
+ruff = "^0.9.4"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
 
-[tool.black]
+[tool.ruff]
+target-version = "py39"
 line-length = 79
-target-version = ["py37"]
 
-[tool.isort]
-profile = "black"
-line_length = 79
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
