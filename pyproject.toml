@@ -1,29 +1,34 @@
-[tool.poetry]
+[project]
 name = "FakeSMTPd"
 version = "2022.10.1"
 description = "SMTP server for testing mail functionality"
-authors = ["Sebastian Rittau <srittau@rittau.biz>"]
-license = "MIT"
-homepage = "https://github.com/srittau/fakesmtpd"
 readme = "README.md"
+authors = [
+    { name = "Sebastian Rittau", email = "srittau@rittau.biz" },
+]
+license = "MIT"
+keywords = ["SMTP", "mail", "testing"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Communications :: Email :: Mail Transport Agents",
     "Topic :: Software Development :: Testing",
 ]
-packages = [{ include = "fakesmtpd" }]
+requires-python = ">= 3.9"
+dependencies = [
+    "typing-extensions >= 4.0.1, < 5",
+]
 
-[tool.poetry.urls]
-"GitHub" = "https://github.com/srittau/fakesmtpd"
-"Bug Tracker" = "https://github.com/srittau/fakesmtpd/issues"
-"Changes" = "https://github.com/srittau/fakesmtpd/blob/main/CHANGELOG.md"
-
-[tool.poetry.scripts]
+[project.scripts]
 fakesmtpd = "fakesmtpd.server:main"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-typing-extensions = "^4.0.1"
+[project.urls]
+"Homepage" = "https://github.com/srittau/fakesmtpd"
+"GitHub" = "https://github.com/srittau/fakesmtpd"
+"Issues" = "https://github.com/srittau/fakesmtpd/issues"
+"Changes" = "https://github.com/srittau/fakesmtpd/blob/main/CHANGELOG.md"
+
+[tool.poetry]
+packages = [{ include = "fakesmtpd" }]
 
 [tool.poetry.group.dev.dependencies]
 mypy = ">=1.14.1,<1.16.0"
