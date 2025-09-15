@@ -31,10 +31,10 @@ fakesmtpd = "fakesmtpd.server:main"
 packages = [{ include = "fakesmtpd" }]
 
 [tool.poetry.group.dev.dependencies]
-mypy = ">=1.14.1,<1.18.0"
+mypy = ">=1.14.1,<1.19.0"
 pytest = ">=6.2.4,<9"
 pytest-mock = ">=3.6.1"
-ruff = ">=0.9.4,<0.13.0"
+ruff = ">=0.9.4,<0.14.0"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
