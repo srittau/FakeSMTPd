@@ -1,11 +1,11 @@
-FROM python:3.10-bullseye AS poetry
+FROM python:3.13 AS poetry
 
 RUN pip install -U pip poetry
 COPY pyproject.toml ./pyproject.toml
 COPY poetry.lock ./poetry.lock
 RUN poetry export -o requirements.txt
 
-FROM python:3.10-bullseye
+FROM python:3.13
 
 # Prepare app dir
 RUN mkdir /app
