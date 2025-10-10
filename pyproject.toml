@@ -1,6 +1,6 @@
 [project]
 name = "FakeSMTPd"
-version = "2025.10.0"
+version = "2025.10.1.dev"
 description = "SMTP server for testing mail functionality"
 readme = "README.md"
 authors = [

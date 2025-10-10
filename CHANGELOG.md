@@ -1,3 +1,5 @@
+# Unreleased Changes
+
 # Changes in FakeSMTPd 2025.10.0
 
 - Add support for Python 3.11 through 3.14.
