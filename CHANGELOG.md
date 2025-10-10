@@ -1,6 +1,7 @@
 # Unreleased changes
 
-- Drop support for Python 3.7 and 3.8.
+- Add support for Python 3.11 through 3.14.
+- Drop support for Python 3.7 through 3.9.
 
 # Changes in FakeSMTPd 2022.10.1
 
