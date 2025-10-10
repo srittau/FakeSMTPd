@@ -1,6 +1,6 @@
 FROM python:3.13 AS poetry
 
-RUN pip install -U pip poetry
+RUN pip install -U pip && pip install poetry poetry-plugin-export
 COPY pyproject.toml ./pyproject.toml
 COPY poetry.lock ./poetry.lock
 RUN poetry export -o requirements.txt
