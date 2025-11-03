@@ -34,7 +34,7 @@ packages = [{ include = "fakesmtpd" }]
 mypy = ">=1.14.1,<1.19.0"
 pytest = ">=6.2.4,<9"
 pytest-mock = ">=3.6.1"
-ruff = "~= 0.14.2"
+ruff = "~= 0.14.3"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
