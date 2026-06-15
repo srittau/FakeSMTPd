@@ -32,9 +32,9 @@ packages = [{ include = "fakesmtpd" }]
 
 [tool.poetry.group.dev.dependencies]
 mypy = ">=2.1.0,<2.2.0"
-pytest = ">=9.0.3,<10"
+pytest = ">=9.1.0,<10"
 pytest-mock = ">=3.6.1"
-ruff = "~= 0.15.16"
+ruff = "~= 0.15.17"
 
 [tool.pytest.ini_options]
 python_files = ["test_*/*.py"]
