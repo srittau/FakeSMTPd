@@ -12,23 +12,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - name: Install Python
-        uses: actions/setup-python@v7
+      - uses: astral-sh/setup-uv@v7
+        name: Install uv
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: "**/poetry.lock"
-      - name: Install poetry
-        run: pip --disable-pip-version-check install -U poetry
+            python-version: ${{ matrix.python-version }}
       - name: Install Python packages
-        run: poetry install
+        run: uv sync --locked
       - name: Lint with ruff
         run: |
-          poetry run ruff --version
-          poetry run ruff check
+          uv run ruff --version
+          uv run ruff check
       - name: Type check with mypy
         run: |
-          poetry run mypy --version
-          poetry run mypy fakesmtpd test_fakesmtpd
+          uv run mypy --version
+          uv run mypy fakesmtpd test_fakesmtpd
       - name: Test with pytest
-        run: poetry run pytest
+        run: uv run pytest

@@ -1,10 +1,3 @@
-FROM python:3.13 AS poetry
-
-RUN pip install -U pip && pip install poetry poetry-plugin-export
-COPY pyproject.toml ./pyproject.toml
-COPY poetry.lock ./poetry.lock
-RUN poetry export -o requirements.txt
-
 FROM python:3.13
 
 # Prepare app dir
@@ -12,19 +5,17 @@ RUN mkdir /app
 WORKDIR /app
 RUN mkdir ./run ./log
 
-# Prepare virtualenv
-RUN python3 -m venv ./virtualenv
-RUN ./virtualenv/bin/pip --disable-pip-version-check install --upgrade pip poetry
-
-# Install dependencies
-COPY --from=poetry requirements.txt /app/requirements.txt
-RUN ./virtualenv/bin/pip --disable-pip-version-check install -r requirements.txt
+# Prepare virtual environment
+ENV UV_PROJECT_ENVIRONMENT=/app/virtualenv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY pyproject.toml uv.lock /app/
+RUN uv venv ./virtualenv
 
 # Install application
-COPY README.md pyproject.toml ./
+COPY README.md LICENSE pyproject.toml ./
 COPY bin/ ./bin
 COPY fakesmtpd/ ./fakesmtpd
-RUN ./virtualenv/bin/pip install .
+RUN uv sync --locked --no-dev
 
 # Start eventstreamd
 EXPOSE 25
