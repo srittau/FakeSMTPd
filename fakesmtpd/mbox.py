@@ -1,15 +1,12 @@
 import sys
-from typing import Any
-
-from typing_extensions import Protocol
+from typing import Protocol
 
 from fakesmtpd.state import State
 
 
 class _MBoxWriter(Protocol):
-    def write(self, __s: str) -> Any: ...
-
-    def flush(self) -> Any: ...
+    def write(self, s: str, /) -> object: ...
+    def flush(self) -> object: ...
 
 
 def print_mbox_mail(filename: str, state: State) -> None:

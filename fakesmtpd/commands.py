@@ -1,5 +1,5 @@
 from socket import getfqdn
-from typing import Tuple
+from typing import TypeAlias
 
 from fakesmtpd.smtp import SYNTAX_ERROR_MSG, SMTPStatus
 from fakesmtpd.state import State
@@ -11,7 +11,7 @@ from fakesmtpd.syntax import (
     parse_reverse_path,
 )
 
-Reply = Tuple[SMTPStatus, str]
+Reply: TypeAlias = tuple[SMTPStatus, str]
 
 
 def handle_data(state: State, arguments: str) -> Reply:

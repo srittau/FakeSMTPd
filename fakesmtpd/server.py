@@ -7,7 +7,7 @@ import sys
 from asyncio.streams import StreamReader, StreamWriter
 from collections.abc import Awaitable, Callable
 from functools import partial
-from typing import Optional
+from typing import TypeAlias
 
 from fakesmtpd.args import parse_args
 from fakesmtpd.connection import ConnectionHandler
@@ -27,8 +27,8 @@ def main() -> None:
         sys.exit(1)
 
 
-_ServerHandler = Callable[
-    [StreamReader, StreamWriter], Optional[Awaitable[None]]
+_ServerHandler: TypeAlias = Callable[
+    [StreamReader, StreamWriter], Awaitable[None] | None
 ]
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import Final
 
 from fakesmtpd.smtp import (
     PATH_TOO_LONG_MSG,
@@ -10,44 +11,46 @@ from fakesmtpd.smtp import (
     SYNTAX_ERROR_MSG,
 )
 
-_LET_DIG = r"[a-zA-Z0-9]"
-_LDH_STR = f"[a-zA-Z0-9-]*{_LET_DIG}"
-_SNUM = r"[0-9]{1,3}"
-_IPV6_HEX = r"[0-9a-fA-F]{1,4}"
-_ATOM = r"[0-9a-zA-Z!#$%&'*+/=?^_`{}|~-]+"
-_DOT_STRING = f"{_ATOM}(\\.{_ATOM})*"
-_Q_TEXT_SMTP = r"[ !#-\[\]-~]"
-_QP_SMTP = r"\\[ -~]"
-_QUOTED_STRING = f'"(({_Q_TEXT_SMTP})|({_QP_SMTP}))*"'
+_LET_DIG: Final = r"[a-zA-Z0-9]"
+_LDH_STR: Final = f"[a-zA-Z0-9-]*{_LET_DIG}"
+_SNUM: Final = r"[0-9]{1,3}"
+_IPV6_HEX: Final = r"[0-9a-fA-F]{1,4}"
+_ATOM: Final = r"[0-9a-zA-Z!#$%&'*+/=?^_`{}|~-]+"
+_DOT_STRING: Final = f"{_ATOM}(\\.{_ATOM})*"
+_Q_TEXT_SMTP: Final = r"[ !#-\[\]-~]"
+_QP_SMTP: Final = r"\\[ -~]"
+_QUOTED_STRING: Final = f'"(({_Q_TEXT_SMTP})|({_QP_SMTP}))*"'
 
-_SUB_DOMAIN = f"{_LET_DIG}({_LDH_STR})?"
-_DOMAIN = f"{_SUB_DOMAIN}(\\.{_SUB_DOMAIN})*"
+_SUB_DOMAIN: Final = f"{_LET_DIG}({_LDH_STR})?"
+_DOMAIN: Final = f"{_SUB_DOMAIN}(\\.{_SUB_DOMAIN})*"
 
-_IPV4_LITERAL = f"({_SNUM})\\.({_SNUM})\\.({_SNUM})\\.({_SNUM})"
-_ADDRESS_LITERAL = r"\[(.*)\]"
+_IPV4_LITERAL: Final = f"({_SNUM})\\.({_SNUM})\\.({_SNUM})\\.({_SNUM})"
+_ADDRESS_LITERAL: Final = r"\[(.*)\]"
 
-_IPV6_FULL = f"{_IPV6_HEX}(:{_IPV6_HEX}){{7}}"
-_IPV6_COMP = f"({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*)?"
-_IPV6V4_FULL = f"{_IPV6_HEX}(:{_IPV6_HEX}){{5}}:({_IPV4_LITERAL})"
-_IPV6V4_COMP = (
+_IPV6_FULL: Final = f"{_IPV6_HEX}(:{_IPV6_HEX}){{7}}"
+_IPV6_COMP: Final = (
+    f"({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*)?"
+)
+_IPV6V4_FULL: Final = f"{_IPV6_HEX}(:{_IPV6_HEX}){{5}}:({_IPV4_LITERAL})"
+_IPV6V4_COMP: Final = (
     f"(({_IPV6_HEX}(:{_IPV6_HEX})*)?::({_IPV6_HEX}(:{_IPV6_HEX})*:)?)"
     f"({_IPV4_LITERAL})"
 )
 
-_ESMTP_PARAM = "([a-zA-Z0-9][a-zA-Z0-9-]*)(=([!-<>-~]+))?"
+_ESMTP_PARAM: Final = "([a-zA-Z0-9][a-zA-Z0-9-]*)(=([!-<>-~]+))?"
 
-_dot_string_re = re.compile(f"^{_DOT_STRING}$")
-_quoted_string_re = re.compile(f"^{_QUOTED_STRING}$")
+_dot_string_re: Final = re.compile(f"^{_DOT_STRING}$")
+_quoted_string_re: Final = re.compile(f"^{_QUOTED_STRING}$")
 
-_domain_re = re.compile(f"^{_DOMAIN}$")
-_ipv4_re = re.compile(f"^{_IPV4_LITERAL}$")
-_ipv6_full_re = re.compile(f"^{_IPV6_FULL}$")
-_ipv6_comp_re = re.compile(f"^{_IPV6_COMP}$")
-_ipv6v4_full_re = re.compile(f"^{_IPV6V4_FULL}$")
-_ipv6v4_comp_re = re.compile(f"^{_IPV6V4_COMP}$")
-_address_literal_re = re.compile(f"^{_ADDRESS_LITERAL}$")
+_domain_re: Final = re.compile(f"^{_DOMAIN}$")
+_ipv4_re: Final = re.compile(f"^{_IPV4_LITERAL}$")
+_ipv6_full_re: Final = re.compile(f"^{_IPV6_FULL}$")
+_ipv6_comp_re: Final = re.compile(f"^{_IPV6_COMP}$")
+_ipv6v4_full_re: Final = re.compile(f"^{_IPV6V4_FULL}$")
+_ipv6v4_comp_re: Final = re.compile(f"^{_IPV6V4_COMP}$")
+_address_literal_re: Final = re.compile(f"^{_ADDRESS_LITERAL}$")
 
-_esmtp_param_re = re.compile(f"^{_ESMTP_PARAM}$")
+_esmtp_param_re: Final = re.compile(f"^{_ESMTP_PARAM}$")
 
 
 def is_valid_domain(s: str) -> bool:

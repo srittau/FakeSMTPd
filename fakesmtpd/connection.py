@@ -5,27 +5,23 @@ import datetime
 import logging
 from collections.abc import Callable
 from socket import getfqdn
-from typing import Any
-
-from typing_extensions import Protocol
+from typing import Final, Protocol
 
 from fakesmtpd.commands import handle_command
 from fakesmtpd.smtp import SMTP_COMMAND_LIMIT, SMTP_TEXT_LINE_LIMIT, SMTPStatus
 from fakesmtpd.state import State
 
-CRLF_LENGTH = 2
+CRLF_LENGTH: Final = 2
 
 
 class _StreamWriterProto(Protocol):
-    def write(self, __b: bytes) -> Any: ...
-
-    def close(self) -> Any: ...
+    def write(self, b: bytes, /) -> object: ...
+    def close(self) -> object: ...
 
 
 class _StreamReaderProto(Protocol):
     def at_eof(self) -> bool: ...
-
-    async def readuntil(self, __until: bytes) -> bytes: ...
+    async def readuntil(self, until: bytes, /) -> bytes: ...
 
 
 class UnexpectedEOFError(Exception):

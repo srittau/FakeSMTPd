@@ -1,13 +1,14 @@
 from enum import Enum
+from typing import Final
 
-SMTP_LOCAL_PART_LIMIT = 64  # RFC 5321, section 4.5.3.1.1.
-SMTP_DOMAIN_LIMIT = 255  # RFC 5321, section 4.5.3.1.2.
-SMTP_PATH_LIMIT = 256  # RFC 5321, section 4.5.3.1.3.
-SMTP_COMMAND_LIMIT = 512  # RFC 5321, section 4.5.3.1.4.
-SMTP_TEXT_LINE_LIMIT = 1000  # RFC 5321, section 4.5.3.1.6.
+SMTP_LOCAL_PART_LIMIT: Final = 64  # RFC 5321, section 4.5.3.1.1.
+SMTP_DOMAIN_LIMIT: Final = 255  # RFC 5321, section 4.5.3.1.2.
+SMTP_PATH_LIMIT: Final = 256  # RFC 5321, section 4.5.3.1.3.
+SMTP_COMMAND_LIMIT: Final = 512  # RFC 5321, section 4.5.3.1.4.
+SMTP_TEXT_LINE_LIMIT: Final = 1000  # RFC 5321, section 4.5.3.1.6.
 
-SYNTAX_ERROR_MSG = "Syntax error in arguments"
-PATH_TOO_LONG_MSG = "Path too long"
+SYNTAX_ERROR_MSG: Final = "Syntax error in arguments"
+PATH_TOO_LONG_MSG: Final = "Path too long"
 
 
 class SMTPStatus(Enum):
