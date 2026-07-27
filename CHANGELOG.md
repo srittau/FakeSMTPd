@@ -1,6 +1,7 @@
 # Unreleased Changes
 
 - Add support for Python 3.15.
+- Fixed running the server with Python 3.14 or above.
 
 # Changes in FakeSMTPd 2025.10.0
 

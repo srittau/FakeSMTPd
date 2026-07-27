@@ -19,8 +19,9 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
     args = parse_args()
     printer = partial(print_mbox_mail, args.output_filename)
+    handler = partial(handle_connection, printer)
     try:
-        run_server(args.bind, args.port, partial(handle_connection, printer))
+        asyncio.run(run_server(args.bind, args.port, handler))
     except PermissionError as exc:
         print(str(exc), file=sys.stderr)
         sys.exit(1)
@@ -31,13 +32,14 @@ _ServerHandler = Callable[
 ]
 
 
-def run_server(host: str, port: int, handler: _ServerHandler) -> None:
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, loop.stop)
-    loop.add_signal_handler(signal.SIGTERM, loop.stop)
-    s = asyncio.start_server(handler, host=host, port=port)
-    loop.run_until_complete(s)
-    loop.run_forever()
+async def run_server(host: str, port: int, handler: _ServerHandler) -> None:
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+    loop.add_signal_handler(signal.SIGINT, stop_event.set)
+    loop.add_signal_handler(signal.SIGTERM, stop_event.set)
+    server = await asyncio.start_server(handler, host=host, port=port)
+    async with server:
+        await stop_event.wait()
 
 
 async def handle_connection(
