@@ -47,7 +47,6 @@ module-name = ["fakesmtpd"]
 python_files = ["test_*/*.py"]
 
 [tool.ruff]
-target-version = "py39"
 line-length = 79
 
 [tool.ruff.lint]
