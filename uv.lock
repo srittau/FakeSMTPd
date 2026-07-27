@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-22T10:24:37.777913021Z"
+exclude-newer = "2026-07-22T10:34:33.398045936Z"
 exclude-newer-span = "P5D"
 
 [[package]]
@@ -74,7 +74,7 @@ wheels = [
 
 [[package]]
 name = "fakesmtpd"
-version = "2025.10.1.dev0"
+version = "2026.7.0"
 source = { editable = "." }
 
 [package.dev-dependencies]

@@ -1,6 +1,6 @@
 # Changelog for FakeSMTPd
 
-## Unreleased
+## 2026.7.0 – 2026-07-27
 
 ### Added
 
