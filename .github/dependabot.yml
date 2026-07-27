@@ -6,6 +6,8 @@ updates:
     schedule:
       interval: weekly
       time: '04:00'
+    cooldown:
+      default-days: 5
     groups:
       dependencies:
         exclude-patterns:
@@ -22,3 +24,5 @@ updates:
     schedule:
       interval: weekly
       time: "04:00"
+    cooldown:
+      default-days: 5
