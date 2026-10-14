@@ -28,7 +28,7 @@ fakesmtpd = "fakesmtpd.server:main"
 
 [dependency-groups]
 dev = [
-    "mypy >=2.3.0,<2.4.0",
+    "mypy ~= 2.4.0",
     "pytest >=9.1.1,<10",
     "pytest-mock >=3.6.1",
     "ruff>=0.15.22,<0.17.0",
